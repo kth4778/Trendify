@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>밈 업로드 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+          },
+          borderRadius: {
+            '2xl': '20px',
+            '3xl': '30px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .upload-card {
+      transition: box-shadow 0.2s ease;
+    }
+    .upload-card:hover {
+      box-shadow: 0 4px 20px -4px rgba(0,0,0,0.10);
+    }
+    .stat-card {
+      transition: background 0.15s ease;
+      cursor: pointer;
+    }
+    .stat-card:hover {
+      background: #f9fafb;
+    }
+    .preview-img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+    .badge-pending  { background: #FFF7ED; color: #C2410C; }
+    .badge-approved { background: #F0FDF4; color: #15803D; }
+    .badge-rejected { background: #FFF1F2; color: #BE123C; }
+  </style>
+</head>
+<body class="bg-gray-50 text-dark antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+
+        <!-- ① Trendify 로고 -->
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+
+        <!-- ② 상단 네비게이션 -->
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+          <a class="nav-link font-bold text-dark" href="upload.html">업로드</a>
+        </div>
+
+        <!-- ③ 검색창 + ④ 프로필 버튼 -->
+        <div class="hidden md:flex items-center gap-3">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <input type="text" placeholder="검색" class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-48 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"/>
+          </div>
+          <a href="mypage.html" class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </a>
+        </div>
+
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="hover:text-brand" href="dictionary.html">유행어 사전</a>
+          <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
+          <a class="hover:text-brand" href="vote.html">트렌드 투표</a>
+          <a class="text-dark" href="upload.html">업로드</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- 브레드크럼 -->
+      <p class="text-sm text-gray-500 mb-6">밈 업로드</p>
+
+      <!-- ⑤ 새 밈 업로드하기 버튼 -->
+      <button
+        onclick="alert('새 밈 제보 등록 페이지로 이동합니다.')"
+        class="w-full py-4 bg-dark text-white font-bold text-base rounded-xl hover:bg-gray-800 active:bg-gray-900 transition-colors mb-8"
+      >
+        새 밈 업로드하기
+      </button>
+
+      <!-- ⑥ 업로드 현황 요약 -->
+      <div class="mb-8">
+        <h2 class="text-base font-bold text-dark mb-4">업로드 현황 요약</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="stat-card bg-white border border-gray-100 rounded-xl px-5 py-5">
+            <p class="text-xs text-gray-400 mb-2">전체 업로드</p>
+            <p class="text-2xl font-black text-dark">1,248</p>
+          </div>
+          <div class="stat-card bg-white border border-gray-100 rounded-xl px-5 py-5">
+            <p class="text-xs text-gray-400 mb-2">검수 대기</p>
+            <p class="text-2xl font-black text-orange-500">37</p>
+          </div>
+          <div class="stat-card bg-white border border-gray-100 rounded-xl px-5 py-5">
+            <p class="text-xs text-gray-400 mb-2">승인 완료</p>
+            <p class="text-2xl font-black text-green-600">1,102</p>
+          </div>
+          <div class="stat-card bg-white border border-gray-100 rounded-xl px-5 py-5">
+            <p class="text-xs text-gray-400 mb-2">반려</p>
+            <p class="text-2xl font-black text-red-500">109</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⑦ 최근 업로드 현황 -->
+      <div>
+        <h2 class="text-base font-bold text-dark mb-4">최근 업로드 현황</h2>
+        <div class="space-y-4">
+
+          <!-- 카드 1 — 아무튼 출근 (검수 대기) -->
+          <div class="upload-card bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div class="flex gap-0">
+              <!-- 썸네일 -->
+              <div class="w-40 md:w-52 flex-shrink-0 bg-gray-100 relative overflow-hidden" style="min-height:130px;">
+                <img
+                  src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400&q=80"
+                  alt="아무튼 출근 썸네일"
+                  class="preview-img absolute inset-0"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <!-- 내용 -->
+              <div class="flex-1 p-5 flex flex-col justify-between min-w-0">
+                <div>
+                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <h3 class="text-sm font-bold text-dark">아무튼 출근</h3>
+                    <span class="badge-pending text-[10px] font-bold px-2 py-0.5 rounded-full">검수 대기</span>
+                  </div>
+                  <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                    직장인 사이에서 퍼지는 출근 관련 밈. 월요일 아침 감성을 담은 짤.
+                  </p>
+                  <p class="text-[10px] text-gray-400">업로더: <span class="font-semibold text-gray-500">김트렌드</span> · 2025.07.14</p>
+                </div>
+              </div>
+              <!-- 처리 메모 -->
+              <div class="hidden md:flex flex-col justify-center px-5 border-l border-gray-100 w-40 flex-shrink-0">
+                <p class="text-[10px] text-gray-300 italic">처리 메모 없음</p>
+              </div>
+            </div>
+            <!-- 밈 미리보기 -->
+            <div class="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center gap-3">
+              <div class="flex gap-2 overflow-x-auto">
+                <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=120&q=70" alt="미리보기1" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=120&q=70" alt="미리보기2" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=120&q=70" alt="미리보기3" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+              </div>
+              <span class="text-[11px] text-gray-400 ml-auto flex-shrink-0">밈 미리보기</span>
+            </div>
+          </div>
+
+          <!-- 카드 2 — 노노노 (승인 완료) -->
+          <div class="upload-card bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div class="flex gap-0">
+              <div class="w-40 md:w-52 flex-shrink-0 bg-gray-100 relative overflow-hidden" style="min-height:130px;">
+                <img
+                  src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80"
+                  alt="노노노 썸네일"
+                  class="preview-img absolute inset-0"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <div class="flex-1 p-5 flex flex-col justify-between min-w-0">
+                <div>
+                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <h3 class="text-sm font-bold text-dark">노노노</h3>
+                    <span class="badge-approved text-[10px] font-bold px-2 py-0.5 rounded-full">승인 완료</span>
+                  </div>
+                  <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                    10대 사이에서 유행 중인 강한사 표현. 유튜브 쇼츠 중심으로 확산.
+                  </p>
+                  <p class="text-[10px] text-gray-400">업로더: <span class="font-semibold text-gray-500">밀티터99</span> · 2025.07.13</p>
+                </div>
+              </div>
+              <div class="hidden md:flex flex-col justify-center px-5 border-l border-gray-100 w-40 flex-shrink-0">
+                <p class="text-[10px] text-green-600 font-semibold">에디터 확인 완료</p>
+                <p class="text-[10px] text-gray-400 mt-0.5">사진 연동 권장</p>
+              </div>
+            </div>
+            <div class="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center gap-3">
+              <div class="flex gap-2 overflow-x-auto">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&q=70" alt="미리보기1" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=120&q=70" alt="미리보기2" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1520810627419-35e6bea3e5af?w=120&q=70" alt="미리보기3" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+              </div>
+              <span class="text-[11px] text-gray-400 ml-auto flex-shrink-0">밈 미리보기</span>
+            </div>
+          </div>
+
+          <!-- 카드 3 — 갓생살기 (승인 완료) -->
+          <div class="upload-card bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div class="flex gap-0">
+              <div class="w-40 md:w-52 flex-shrink-0 bg-gray-100 relative overflow-hidden" style="min-height:130px;">
+                <img
+                  src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80"
+                  alt="갓생살기 썸네일"
+                  class="preview-img absolute inset-0"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <div class="flex-1 p-5 flex flex-col justify-between min-w-0">
+                <div>
+                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <h3 class="text-sm font-bold text-dark">갓생살기</h3>
+                    <span class="badge-approved text-[10px] font-bold px-2 py-0.5 rounded-full">승인 완료</span>
+                  </div>
+                  <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                    갓(God)+생(생활)의 합성어. 계획적이고 생산적인 삶을 사는 것을 뜻하는 신조어.
+                  </p>
+                  <p class="text-[10px] text-gray-400">업로더: <span class="font-semibold text-gray-500">트렌드헌터</span> · 2025.07.12</p>
+                </div>
+              </div>
+              <div class="hidden md:flex flex-col justify-center px-5 border-l border-gray-100 w-40 flex-shrink-0">
+                <p class="text-[10px] text-green-600 font-semibold">에디터 확인 완료</p>
+                <p class="text-[10px] text-gray-400 mt-0.5">태그 추가 완료</p>
+              </div>
+            </div>
+            <div class="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center gap-3">
+              <div class="flex gap-2 overflow-x-auto">
+                <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=120&q=70" alt="미리보기1" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=120&q=70" alt="미리보기2" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=120&q=70" alt="미리보기3" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+              </div>
+              <span class="text-[11px] text-gray-400 ml-auto flex-shrink-0">밈 미리보기</span>
+            </div>
+          </div>
+
+          <!-- 카드 4 — 오운완 (반려) -->
+          <div class="upload-card bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div class="flex gap-0">
+              <div class="w-40 md:w-52 flex-shrink-0 bg-gray-100 relative overflow-hidden" style="min-height:130px;">
+                <img
+                  src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=80"
+                  alt="오운완 썸네일"
+                  class="preview-img absolute inset-0"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <div class="flex-1 p-5 flex flex-col justify-between min-w-0">
+                <div>
+                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <h3 class="text-sm font-bold text-dark">오운완 챌린지</h3>
+                    <span class="badge-rejected text-[10px] font-bold px-2 py-0.5 rounded-full">반려</span>
+                  </div>
+                  <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                    오늘 운동 완료. SNS 운동 인증 문화와 함께 확산된 챌린지성 밈.
+                  </p>
+                  <p class="text-[10px] text-gray-400">업로더: <span class="font-semibold text-gray-500">헬린이123</span> · 2025.07.11</p>
+                </div>
+              </div>
+              <div class="hidden md:flex flex-col justify-center px-5 border-l border-gray-100 w-40 flex-shrink-0">
+                <p class="text-[10px] text-red-500 font-semibold">중복 제보 반려</p>
+                <p class="text-[10px] text-gray-400 mt-0.5">기존 등록 항목 참고</p>
+              </div>
+            </div>
+            <div class="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center gap-3">
+              <div class="flex gap-2 overflow-x-auto">
+                <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=120&q=70" alt="미리보기1" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=120&q=70" alt="미리보기2" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1581009137042-c552e485697a?w=120&q=70" alt="미리보기3" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+              </div>
+              <span class="text-[11px] text-gray-400 ml-auto flex-shrink-0">밈 미리보기</span>
+            </div>
+          </div>
+
+          <!-- 카드 5 — 중꺾마 (검수 대기) -->
+          <div class="upload-card bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div class="flex gap-0">
+              <div class="w-40 md:w-52 flex-shrink-0 bg-gray-100 relative overflow-hidden" style="min-height:130px;">
+                <img
+                  src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&q=80"
+                  alt="중꺾마 썸네일"
+                  class="preview-img absolute inset-0"
+                  style="width:100%;height:100%;object-fit:cover;"
+                />
+              </div>
+              <div class="flex-1 p-5 flex flex-col justify-between min-w-0">
+                <div>
+                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <h3 class="text-sm font-bold text-dark">중꺾마 스포츠 짤</h3>
+                    <span class="badge-pending text-[10px] font-bold px-2 py-0.5 rounded-full">검수 대기</span>
+                  </div>
+                  <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                    역전승 순간을 포착한 스포츠 짤. 포기하지 않는 정신을 담아 커뮤니티에서 급확산.
+                  </p>
+                  <p class="text-[10px] text-gray-400">업로더: <span class="font-semibold text-gray-500">스포츠팬</span> · 2025.07.10</p>
+                </div>
+              </div>
+              <div class="hidden md:flex flex-col justify-center px-5 border-l border-gray-100 w-40 flex-shrink-0">
+                <p class="text-[10px] text-gray-300 italic">처리 메모 없음</p>
+              </div>
+            </div>
+            <div class="border-t border-gray-100 bg-gray-50 px-5 py-3 flex items-center gap-3">
+              <div class="flex gap-2 overflow-x-auto">
+                <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=120&q=70" alt="미리보기1" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=120&q=70" alt="미리보기2" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+                <img src="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=120&q=70" alt="미리보기3" class="w-16 h-10 object-cover rounded-lg flex-shrink-0"/>
+              </div>
+              <span class="text-[11px] text-gray-400 ml-auto flex-shrink-0">밈 미리보기</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 bg-white py-6 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>마이페이지 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+          },
+          borderRadius: {
+            '2xl': '20px',
+            '3xl': '30px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .activity-row {
+      transition: background 0.15s ease;
+    }
+    .activity-row:hover {
+      background-color: #f9fafb;
+    }
+    .activity-row:hover .chevron {
+      transform: translateX(3px);
+      color: #111111;
+    }
+    .chevron {
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+  </style>
+</head>
+<body class="bg-white text-dark antialiased min-h-screen flex flex-col">
+
+  <!-- ① Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+
+        <!-- ① Trendify 로고 -->
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+
+        <!-- ② 상단 네비게이션 -->
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+
+        <!-- ③ 검색창 + ④ 프로필 버튼 -->
+        <div class="hidden md:flex items-center gap-3">
+          <!-- ③ 검색창 -->
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="검색"
+              class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-48 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"
+            />
+          </div>
+          <!-- ④ 프로필 버튼 (현재 페이지 — 강조) -->
+          <a href="mypage.html" class="w-9 h-9 rounded-full bg-dark flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="hover:text-brand" href="dictionary.html">유행어 사전</a>
+          <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
+          <a class="hover:text-brand" href="vote.html">트렌드 투표</a>
+          <a class="hover:text-brand" href="upload.html">업로드</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- 브레드크럼 -->
+      <p class="text-sm text-gray-500 mb-6">마이페이지</p>
+
+      <!-- ⑤⑥⑦ 프로필 섹션 -->
+      <div class="flex items-center justify-between mb-10">
+
+        <div class="flex items-center gap-6">
+          <!-- ⑤ 프로필 이미지 (원형) -->
+          <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-gray-100">
+            <span class="text-sm font-bold text-gray-500">프로</span>
+          </div>
+
+          <!-- ⑥ 회원 기본 정보 -->
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h1 class="text-xl font-bold text-dark">홍길동</h1>
+            </div>
+            <p class="text-sm text-gray-500 mb-0.5">hong@trendify.kr</p>
+            <p class="text-xs text-gray-400">일반 회원 · 2023년 3월 가입</p>
+          </div>
+        </div>
+
+        <!-- ⑦ 회원정보 수정 버튼 -->
+        <button
+          onclick="alert('회원정보 수정 페이지로 이동합니다.')"
+          class="px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-lg hover:bg-gray-800 active:bg-gray-900 transition-colors flex-shrink-0"
+        >
+          회원정보 수정
+        </button>
+      </div>
+
+      <!-- ⑧ 나의 활동 섹션 -->
+      <div>
+        <h2 class="text-base font-bold text-dark mb-4">나의 활동</h2>
+
+        <!-- 활동 리스트 카드 -->
+        <div class="border border-gray-200 rounded-2xl overflow-hidden">
+
+          <!-- ⑨ 관심 트렌드 -->
+          <a href="#" class="activity-row flex items-center justify-between px-6 py-5 border-b border-gray-100 cursor-pointer block">
+            <div>
+              <p class="text-sm font-semibold text-dark mb-1">관심 트렌드</p>
+              <p class="text-xs text-gray-400">저장한 트렌드와 팔로우 중인 키워드를 확인한다</p>
+            </div>
+            <svg class="chevron w-5 h-5 text-gray-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- ⑩ 제보 내역 -->
+          <a href="#" class="activity-row flex items-center justify-between px-6 py-5 border-b border-gray-100 cursor-pointer block">
+            <div>
+              <p class="text-sm font-semibold text-dark mb-1">제보 내역</p>
+              <p class="text-xs text-gray-400">직접 제보한 트렌드의 검수 상태를 확인한다</p>
+            </div>
+            <svg class="chevron w-5 h-5 text-gray-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- ⑪ 투표 기록 -->
+          <a href="#" class="activity-row flex items-center justify-between px-6 py-5 border-b border-gray-100 cursor-pointer block">
+            <div>
+              <p class="text-sm font-semibold text-dark mb-1">투표 기록</p>
+              <p class="text-xs text-gray-400">참여한 트렌드 대결과 투표 결과를 돌아본다</p>
+            </div>
+            <svg class="chevron w-5 h-5 text-gray-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+          <!-- ⑫ 가상 포트폴리오 -->
+          <a href="#" class="activity-row flex items-center justify-between px-6 py-5 cursor-pointer block">
+            <div>
+              <p class="text-sm font-semibold text-dark mb-1">가상 포트폴리오</p>
+              <p class="text-xs text-gray-400">보유 중인 밈 주식과 수익률을 확인한다</p>
+            </div>
+            <svg class="chevron w-5 h-5 text-gray-300 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 py-6 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

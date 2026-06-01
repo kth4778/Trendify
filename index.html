@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Trendify - 지금 가장 핫한 트렌드를 찾으세요</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+            muted: '#666666',
+            lightGray: '#F8F9FA',
+          },
+          borderRadius: {
+            '2xl': '20px',
+            '3xl': '30px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    .shadow-soft {
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+    }
+    .hero-bg {
+      background-color: #00FF00;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.12);
+    }
+    .trend-item {
+      transition: background 0.15s ease;
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin: 0 -12px;
+    }
+    .trend-item:hover {
+      background: #f9fafb;
+    }
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 20s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body class="bg-white text-dark antialiased">
+
+  <!-- Ticker Bar -->
+  <div class="bg-dark text-white py-2 overflow-hidden">
+    <div class="ticker-wrap">
+      <div class="ticker-inner text-xs font-semibold">
+        <span class="mr-12">🔥 중꺾마 +12%</span>
+        <span class="mr-12">📈 너뭐돼? +8%</span>
+        <span class="mr-12">⚡ 오운완 +5%</span>
+        <span class="mr-12">🚀 폼미쳤다 +3%</span>
+        <span class="mr-12">💚 내또출근 +7%</span>
+        <span class="mr-12">🔥 민초단결 +4%</span>
+        <span class="mr-12">📈 갓생살기 +9%</span>
+        <span class="mr-12">⚡ 혼공족 +2%</span>
+        <!-- duplicate for seamless loop -->
+        <span class="mr-12">🔥 중꺾마 +12%</span>
+        <span class="mr-12">📈 너뭐돼? +8%</span>
+        <span class="mr-12">⚡ 오운완 +5%</span>
+        <span class="mr-12">🚀 폼미쳤다 +3%</span>
+        <span class="mr-12">💚 내또출근 +7%</span>
+        <span class="mr-12">🔥 민초단결 +4%</span>
+        <span class="mr-12">📈 갓생살기 +9%</span>
+        <span class="mr-12">⚡ 혼공족 +2%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex-shrink-0 flex items-center">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+        <div class="hidden md:flex space-x-8 text-sm font-semibold text-gray-700">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-4 text-xs font-medium text-gray-500">
+          <a class="hover:text-dark transition-colors" href="login.html">로그인</a>
+          <a class="hover:text-dark transition-colors" href="signup.html">회원가입</a>
+          <a class="px-4 py-2 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors" href="mypage.html">마이페이지</a>
+        </div>
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="toggleMobileMenu()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="hover:text-brand" href="dictionary.html">유행어 사전</a>
+          <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
+          <a class="hover:text-brand" href="vote.html">트렌드 투표</a>
+          <a class="hover:text-brand" href="upload.html">업로드</a>
+          <div class="flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="login.html">로그인</a>
+            <a href="signup.html">회원가입</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-bg py-16 md:py-24 px-4 text-center">
+      <div class="max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-xs font-bold mb-6">
+          <span class="pulse-dot w-2 h-2 bg-dark rounded-full inline-block"></span>
+          실시간 트렌드 업데이트 중
+        </div>
+        <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+          지금 가장 핫한<br/>
+          <span class="bg-dark text-brand px-3 py-1 inline-block">트렌드</span>를 찾으세요
+        </h1>
+        <p class="text-dark font-medium mb-10 opacity-80">
+          유행어 사전부터 밈주식 거래소까지,<br/>
+          Trendify와 함께 트렌드의 파도를 타보세요.
+        </p>
+        <!-- Search Bar -->
+        <div class="relative max-w-xl mx-auto mb-8">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+          </div>
+          <input
+            class="block w-full pl-12 pr-24 py-4 rounded-full border-none shadow-xl focus:ring-2 focus:ring-dark text-sm md:text-base"
+            placeholder="궁금한 유행어나 밈을 검색해보세요"
+            type="text"
+            id="searchInput"
+          />
+          <button
+            onclick="handleSearch()"
+            class="absolute right-2 top-2 bottom-2 px-6 bg-dark text-white rounded-full text-sm font-bold hover:bg-gray-800 transition-colors"
+          >검색</button>
+        </div>
+        <!-- Hashtags -->
+        <div class="flex flex-wrap justify-center gap-2 text-xs font-semibold">
+          <span class="px-3 py-1 bg-white/30 rounded-full cursor-pointer hover:bg-white/50 transition-colors">#중꺾마</span>
+          <span class="px-3 py-1 bg-white/30 rounded-full cursor-pointer hover:bg-white/50 transition-colors">#너뭐돼?</span>
+          <span class="px-3 py-1 bg-white/30 rounded-full cursor-pointer hover:bg-white/50 transition-colors">#폼미쳤다</span>
+          <span class="px-3 py-1 bg-white/30 rounded-full cursor-pointer hover:bg-white/50 transition-colors">#오운완</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trends Dashboard -->
+    <section class="max-w-7xl mx-auto px-4 -mt-12 mb-20">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Meme Stock Chart -->
+        <div class="lg:col-span-2 bg-white rounded-3xl p-8 shadow-soft border border-gray-50 card-hover">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="text-xl font-bold flex items-center gap-2">
+                <span>📈</span> 실시간 밈주식 현황
+              </h3>
+              <p class="text-sm text-gray-400">인기 상승 중인 밈의 가치 변동 추이</p>
+            </div>
+            <a href="meme-stock.html" class="text-xs font-bold text-gray-400 border border-gray-200 px-3 py-1 rounded-lg hover:bg-gray-50 transition-colors">전체보기</a>
+          </div>
+          <!-- Chart -->
+          <div class="h-48 mb-4 relative">
+            <canvas id="stockChart" class="w-full h-full"></canvas>
+            <div class="absolute bottom-0 w-full flex justify-between text-[10px] text-gray-400 px-2">
+              <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span>
+            </div>
+          </div>
+          <!-- Top Stock -->
+          <div class="bg-gray-50 rounded-2xl p-4 flex items-center justify-between border border-gray-100">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center font-black text-lg shadow-sm border border-gray-100">1</div>
+              <div>
+                <p class="font-bold text-sm">중요한 건 꺾이지 않는 마음</p>
+                <p class="text-[11px] text-gray-400">현재가 <span class="font-bold text-dark">1,450P</span> <span class="text-green-500 font-bold">(+125P)</span></p>
+              </div>
+            </div>
+            <div class="text-green-500 bg-green-50 p-2 rounded-xl">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rising Trends -->
+        <div class="bg-white rounded-3xl p-8 shadow-soft border border-gray-50 card-hover">
+          <h3 class="text-xl font-bold flex items-center gap-2 mb-6">
+            <span class="text-orange-500">🔥</span> 급상승 트렌드
+          </h3>
+          <ul class="space-y-1 mb-8">
+            <li class="trend-item flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-brand font-black w-4 text-sm">1</span>
+                <span class="text-sm font-semibold">중요한 건 꺾이지 않는 마음</span>
+              </div>
+              <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">+12%</span>
+            </li>
+            <li class="trend-item flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-gray-300 font-black w-4 text-sm">2</span>
+                <span class="text-sm font-semibold">너 뭐 돼?</span>
+              </div>
+              <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">+8%</span>
+            </li>
+            <li class="trend-item flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-gray-300 font-black w-4 text-sm">3</span>
+                <span class="text-sm font-semibold">오운완</span>
+              </div>
+              <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">+5%</span>
+            </li>
+            <li class="trend-item flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-gray-300 font-black w-4 text-sm">4</span>
+                <span class="text-sm font-semibold">폼 미쳤다</span>
+              </div>
+              <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">+3%</span>
+            </li>
+            <li class="trend-item flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-gray-300 font-black w-4 text-sm">5</span>
+                <span class="text-sm font-semibold">내 또 출근</span>
+              </div>
+              <span class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">+7%</span>
+            </li>
+          </ul>
+          <!-- Quiz Banner -->
+          <div class="bg-dark rounded-2xl p-5 text-white">
+            <p class="text-[10px] text-gray-400 mb-1">오늘의 퀴즈</p>
+            <p class="text-sm font-bold mb-4">"내 또 출근"의 뜻을 아시나요?</p>
+            <button onclick="alert('정답: 월요일 아침마다 반복되는 직장인의 고통을 표현한 밈입니다 😂')" class="w-full py-2 bg-gray-800 rounded-xl text-xs font-bold hover:bg-gray-700 transition-colors">정답 확인하기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Explore Grid -->
+    <section class="max-w-7xl mx-auto px-4 mb-24">
+      <div class="mb-10">
+        <h2 class="text-3xl font-black mb-2">Explore Trendify</h2>
+        <p class="text-gray-500">유행의 모든 것을 경험해보세요</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- 유행어 사전 -->
+        <a href="dictionary.html" class="bg-white border border-gray-100 p-8 rounded-3xl text-center shadow-sm card-hover block group">
+          <div class="w-12 h-12 bg-green-50 text-brand rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+          </div>
+          <h4 class="text-lg font-bold mb-2">유행어 사전</h4>
+          <p class="text-xs text-gray-400">의미부터 유래까지<br/>가장 완벽한 밈 사전</p>
+        </a>
+        <!-- 밈주식 -->
+        <a href="meme-stock.html" class="bg-white border border-gray-100 p-8 rounded-3xl text-center shadow-sm card-hover block group">
+          <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+          </div>
+          <h4 class="text-lg font-bold mb-2">밈주식</h4>
+          <p class="text-xs text-gray-400">트렌드의 흐름을<br/>숫자로 증명하세요</p>
+        </a>
+        <!-- 트렌드 투표 -->
+        <a href="vote.html" class="bg-white border border-gray-100 p-8 rounded-3xl text-center shadow-sm card-hover block group">
+          <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+          </div>
+          <h4 class="text-lg font-bold mb-2">트렌드 투표</h4>
+          <p class="text-xs text-gray-400">당신의 선택이<br/>곧 다음 유행이 됩니다</p>
+        </a>
+        <!-- 업로드 -->
+        <a href="upload.html" class="bg-white border border-gray-100 p-8 rounded-3xl text-center shadow-sm card-hover block group">
+          <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+          </div>
+          <h4 class="text-lg font-bold mb-2">업로드</h4>
+          <p class="text-xs text-gray-400">새로운 밈의<br/>창조주가 되어보세요</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Today's Hot Memes -->
+    <section class="max-w-7xl mx-auto px-4 mb-24">
+      <div class="flex justify-between items-end mb-10">
+        <div>
+          <h2 class="text-3xl font-black mb-2">오늘의 핫 밈</h2>
+          <p class="text-gray-500">지금 이 순간 가장 많이 회자되는 유행어</p>
+        </div>
+        <a href="dictionary.html" class="text-sm font-bold text-gray-400 hover:text-dark transition-colors">전체보기 →</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Meme Card 1 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm card-hover">
+          <div class="flex items-start justify-between mb-4">
+            <span class="px-3 py-1 bg-green-50 text-brand text-xs font-bold rounded-full">신조어</span>
+            <span class="text-xs text-gray-400">조회 12.4K</span>
+          </div>
+          <h4 class="text-lg font-black mb-2">중꺾마</h4>
+          <p class="text-sm text-gray-500 mb-4 leading-relaxed">"중요한 건 꺾이지 않는 마음"의 줄임말. 포기하지 않는 정신을 표현할 때 사용.</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-1">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">#스포츠</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">#동기부여</span>
+            </div>
+            <span class="text-green-500 text-xs font-bold">↑ 12%</span>
+          </div>
+        </div>
+        <!-- Meme Card 2 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm card-hover">
+          <div class="flex items-start justify-between mb-4">
+            <span class="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-full">유행어</span>
+            <span class="text-xs text-gray-400">조회 9.8K</span>
+          </div>
+          <h4 class="text-lg font-black mb-2">너 뭐 돼?</h4>
+          <p class="text-sm text-gray-500 mb-4 leading-relaxed">상대방의 정체나 직업, 능력 등을 물어볼 때 쓰는 말. 놀라운 상황에서 감탄의 뉘앙스로 사용.</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-1">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">#드라마</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">#일상</span>
+            </div>
+            <span class="text-green-500 text-xs font-bold">↑ 8%</span>
+          </div>
+        </div>
+        <!-- Meme Card 3 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm card-hover">
+          <div class="flex items-start justify-between mb-4">
+            <span class="px-3 py-1 bg-orange-50 text-orange-500 text-xs font-bold rounded-full">챌린지</span>
+            <span class="text-xs text-gray-400">조회 7.2K</span>
+          </div>
+          <h4 class="text-lg font-black mb-2">오운완</h4>
+          <p class="text-sm text-gray-500 mb-4 leading-relaxed">"오늘 운동 완료"의 줄임말. SNS에서 운동 인증 문화와 함께 급속도로 퍼진 신조어.</p>
+          <div class="flex items-center justify-between">
+            <div class="flex gap-1">
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">#운동</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">#SNS</span>
+            </div>
+            <span class="text-green-500 text-xs font-bold">↑ 5%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="max-w-7xl mx-auto px-4 mb-24">
+      <div class="bg-dark rounded-[40px] p-10 md:p-16 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-brand/10 blur-[100px]"></div>
+        <div class="absolute bottom-0 left-1/3 w-48 h-48 bg-brand/5 blur-[80px]"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-full text-xs font-bold text-gray-300 mb-6">
+              <span class="w-2 h-2 bg-brand rounded-full"></span>
+              커뮤니티 라이브
+            </div>
+            <h2 class="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
+              트렌드 파도를 타는<br/>
+              <span class="text-brand">24만 명</span>의 동료들
+            </h2>
+            <p class="text-gray-400 mb-10 leading-relaxed">
+              지금 가입하고 전국의 트렌드세터들과 소통하세요.<br/>
+              함께 웃고, 함께 즐기며 트렌드를 만들어갑니다.
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <a href="upload.html" class="px-8 py-4 bg-brand text-dark font-bold rounded-2xl hover:brightness-90 transition-all">지금 시작하기</a>
+              <a href="dictionary.html" class="px-8 py-4 bg-white/10 text-white font-bold rounded-2xl hover:bg-white/20 transition-all border border-white/10">둘러보기</a>
+            </div>
+          </div>
+          <!-- Community Cards -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-4 mt-8">
+              <div class="bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center text-[10px] font-bold text-white">민</div>
+                  <span class="text-[11px] font-bold text-white">민트초코단</span>
+                </div>
+                <p class="text-[11px] text-gray-300">"민초는 사랑입니다..."</p>
+              </div>
+              <div class="bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white">행</div>
+                  <span class="text-[11px] font-bold text-white">행복스타</span>
+                </div>
+                <p class="text-[11px] text-gray-300">"이게 밈 되는 거 시간문제임 ㄷㄷ"</p>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-[10px] font-bold text-white">트</div>
+                  <span class="text-[11px] font-bold text-white">트렌드감별사</span>
+                </div>
+                <p class="text-[11px] text-gray-300">"딱 유행하기 좋은 주제네요..."</p>
+              </div>
+              <div class="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 flex flex-col items-center justify-center gap-1">
+                <span class="text-2xl font-black text-brand">+99</span>
+                <span class="text-[10px] text-gray-500">오늘 새 게시물</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-100 pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div class="col-span-1 md:col-span-2">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="p-2 bg-dark rounded-lg text-brand text-xl font-black">T</span>
+            <span class="text-2xl font-black text-dark tracking-tighter">Trendify</span>
+          </div>
+          <p class="text-sm text-gray-400 max-w-xs leading-relaxed">
+            대한민국 트렌드의 모든 것.<br/>
+            유행어 사전부터 밈주식 거래소까지.
+          </p>
+          <div class="flex gap-3 mt-6">
+            <a href="#" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+              <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+              <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h5 class="text-sm font-bold mb-6">서비스</h5>
+          <ul class="space-y-4 text-sm text-gray-500">
+            <li><a class="hover:text-dark transition-colors" href="dictionary.html">유행어 사전</a></li>
+            <li><a class="hover:text-dark transition-colors" href="meme-stock.html">밈주식</a></li>
+            <li><a class="hover:text-dark transition-colors" href="vote.html">트렌드 투표</a></li>
+            <li><a class="hover:text-dark transition-colors" href="upload.html">업로드</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-sm font-bold mb-6">고객지원</h5>
+          <ul class="space-y-4 text-sm text-gray-500">
+            <li><a class="hover:text-dark transition-colors" href="#">공지사항</a></li>
+            <li><a class="hover:text-dark transition-colors" href="#">1:1 문의</a></li>
+            <li><a class="hover:text-dark transition-colors" href="signup.html">회원가입</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-400">
+        <p>© 2024 Trendify. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a class="hover:text-dark" href="#">이용약관</a>
+          <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    // Search handler
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) {
+        alert(`"${query}" 검색 결과 페이지로 이동합니다.`);
+      }
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    // Canvas chart
+    const canvas = document.getElementById('stockChart');
+    const ctx = canvas.getContext('2d');
+
+    function drawChart() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = 180 * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = '180px';
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = 180;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid lines
+      ctx.strokeStyle = '#f0f0f0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const y = (h / 4) * i + 10;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Chart line
+      const points = [
+        [0, 140], [w * 0.14, 130], [w * 0.28, 75], [w * 0.43, 115],
+        [w * 0.57, 85], [w * 0.71, 50], [w * 0.85, 65], [w, 40]
+      ];
+
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length - 1; i++) {
+        const cpx = (points[i][0] + points[i + 1][0]) / 2;
+        const cpy = (points[i][1] + points[i + 1][1]) / 2;
+        ctx.quadraticCurveTo(points[i][0], points[i][1], cpx, cpy);
+      }
+      ctx.lineTo(points[points.length - 1][0], points[points.length - 1][1]);
+
+      ctx.strokeStyle = '#00FF00';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Gradient fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, 'rgba(0, 255, 0, 0.25)');
+      gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Endpoint dot
+      ctx.beginPath();
+      ctx.arc(points[points.length-1][0], points[points.length-1][1], 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#00FF00';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    drawChart();
+    window.addEventListener('resize', drawChart);
+  </script>
+</body>
+</html>

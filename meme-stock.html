@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>밈 주식 대시보드 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+          },
+          borderRadius: {
+            '2xl': '20px',
+            '3xl': '30px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    .stock-row {
+      transition: background 0.15s ease;
+    }
+    .stock-row:hover { background: #f9fafb; }
+
+    .mini-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .mini-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #d1d5db, #9ca3af);
+    }
+
+    .ticker-wrap { overflow: hidden; white-space: nowrap; }
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 22s linear infinite;
+    }
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .rise  { color: #16a34a; }
+    .fall  { color: #dc2626; }
+
+    .community-item {
+      transition: background 0.15s;
+    }
+    .community-item:hover { background: #f9fafb; }
+  </style>
+</head>
+<body class="bg-gray-50 text-dark antialiased min-h-screen flex flex-col">
+
+  <!-- Ticker -->
+  <div class="bg-dark text-white py-1.5 overflow-hidden">
+    <div class="ticker-wrap">
+      <div class="ticker-inner text-xs font-semibold">
+        <span class="mr-10 text-green-400">▲ 중꺾마 +34.2%</span>
+        <span class="mr-10 text-green-400">▲ 갓생 +47.9%</span>
+        <span class="mr-10 text-green-400">▲ 킹받다 +21.7%</span>
+        <span class="mr-10 text-red-400">▼ 현타 -8.3%</span>
+        <span class="mr-10 text-green-400">▲ 알잘딱깔센 +15.1%</span>
+        <span class="mr-10 text-green-400">▲ 너뭐돼 +12.4%</span>
+        <span class="mr-10 text-red-400">▼ 스불재 -3.2%</span>
+        <span class="mr-10 text-green-400">▲ 오운완 +9.8%</span>
+        <!-- dup -->
+        <span class="mr-10 text-green-400">▲ 중꺾마 +34.2%</span>
+        <span class="mr-10 text-green-400">▲ 갓생 +47.9%</span>
+        <span class="mr-10 text-green-400">▲ 킹받다 +21.7%</span>
+        <span class="mr-10 text-red-400">▼ 현타 -8.3%</span>
+        <span class="mr-10 text-green-400">▲ 알잘딱깔센 +15.1%</span>
+        <span class="mr-10 text-green-400">▲ 너뭐돼 +12.4%</span>
+        <span class="mr-10 text-red-400">▼ 스불재 -3.2%</span>
+        <span class="mr-10 text-green-400">▲ 오운완 +9.8%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+        <!-- ① 로고 -->
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+        <!-- ② 네비게이션 -->
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="meme-stock.html">밈주식</a>
+          <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+        <!-- ③ 검색 + ④ 프로필 -->
+        <div class="hidden md:flex items-center gap-3">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <input type="text" placeholder="검색" class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-44 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"/>
+          </div>
+          <a href="mypage.html" class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </a>
+        </div>
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a href="dictionary.html">유행어 사전</a>
+          <a class="text-dark font-black" href="meme-stock.html">밈주식</a>
+          <a href="vote.html">트렌드 투표</a>
+          <a href="upload.html">업로드</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- 브레드크럼 -->
+      <p class="text-sm text-gray-500 mb-6">밈 주식 대시보드</p>
+
+      <!-- ⑤ 핵심 지표 요약 카드 4개 -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+        <!-- 시장 종합 지수 -->
+        <div class="bg-white border border-gray-100 rounded-2xl px-5 py-5 shadow-sm">
+          <p class="text-[11px] text-gray-400 mb-1">시장 종합 지수</p>
+          <p class="text-2xl font-black text-dark tracking-tight mb-1">MEME-X</p>
+          <p class="text-sm font-bold text-green-600">+12.4% <span class="font-normal text-gray-400 text-xs">오늘</span></p>
+        </div>
+
+        <!-- 총 거래량 -->
+        <div class="bg-white border border-gray-100 rounded-2xl px-5 py-5 shadow-sm">
+          <p class="text-[11px] text-gray-400 mb-1">총 거래량</p>
+          <p class="text-2xl font-black text-dark tracking-tight mb-1">4.2M</p>
+          <div class="mini-bar mb-1"><div class="mini-bar-fill" style="width:68%"></div></div>
+          <p class="text-[10px] text-gray-400">24시간 기준</p>
+        </div>
+
+        <!-- 급등 종목 수 -->
+        <div class="bg-white border border-gray-100 rounded-2xl px-5 py-5 shadow-sm">
+          <p class="text-[11px] text-gray-400 mb-1">급등 종목 수</p>
+          <p class="text-2xl font-black text-green-600 tracking-tight mb-1">23</p>
+          <div class="mini-bar mb-1"><div class="mini-bar-fill" style="width:45%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div>
+          <p class="text-[10px] text-gray-400">상위 10% 기준</p>
+        </div>
+
+        <!-- 화제 언급량 -->
+        <div class="bg-white border border-gray-100 rounded-2xl px-5 py-5 shadow-sm">
+          <p class="text-[11px] text-gray-400 mb-1">화제 언급량</p>
+          <p class="text-2xl font-black text-dark tracking-tight mb-1">189K</p>
+          <div class="mini-bar mb-1"><div class="mini-bar-fill" style="width:82%;background:linear-gradient(90deg,#c4b5fd,#7c3aed)"></div></div>
+          <p class="text-[10px] text-gray-400">실시간 집계</p>
+        </div>
+      </div>
+
+      <!-- 2컬럼 레이아웃 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- ⑥ 실시간 급등락 종목 -->
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-100">
+            <h2 class="text-base font-bold text-dark">실시간 급등락 종목</h2>
+          </div>
+
+          <div class="divide-y divide-gray-50">
+
+            <!-- 중꺾마 -->
+            <div class="stock-row flex items-center gap-4 px-6 py-4">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-dark">중꺾마</p>
+                <p class="text-[11px] text-gray-400">포기 안 하는 한국인 정서 폭발</p>
+              </div>
+              <div class="text-right mr-4">
+                <span class="text-sm font-black rise">+34.2%</span>
+              </div>
+              <button onclick="alert('중꺾마 종목 상세 페이지로 이동합니다.')" class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                상세 보기
+              </button>
+            </div>
+
+            <!-- 갓생 -->
+            <div class="stock-row flex items-center gap-4 px-6 py-4">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-dark">갓생</p>
+                <p class="text-[11px] text-gray-400">자기계발 유행 재점화</p>
+              </div>
+              <div class="text-right mr-4">
+                <span class="text-sm font-black rise">+47.9%</span>
+              </div>
+              <button onclick="alert('갓생 종목 상세 페이지로 이동합니다.')" class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                상세 보기
+              </button>
+            </div>
+
+            <!-- 킹받다 -->
+            <div class="stock-row flex items-center gap-4 px-6 py-4">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-dark">킹받다</p>
+                <p class="text-[11px] text-gray-400">짜증 표현 신조어 SNS 확산</p>
+              </div>
+              <div class="text-right mr-4">
+                <span class="text-sm font-black rise">+21.7%</span>
+              </div>
+              <button onclick="alert('킹받다 종목 상세 페이지로 이동합니다.')" class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                상세 보기
+              </button>
+            </div>
+
+            <!-- 현타 -->
+            <div class="stock-row flex items-center gap-4 px-6 py-4">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-dark">현타</p>
+                <p class="text-[11px] text-gray-400">현실 자각 콘텐츠 피로도 증가</p>
+              </div>
+              <div class="text-right mr-4">
+                <span class="text-sm font-black fall">-8.3%</span>
+              </div>
+              <button onclick="alert('현타 종목 상세 페이지로 이동합니다.')" class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                상세 보기
+              </button>
+            </div>
+
+            <!-- 알잘딱깔센 -->
+            <div class="stock-row flex items-center gap-4 px-6 py-4">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-dark">알잘딱깔센</p>
+                <p class="text-[11px] text-gray-400">직장인 밈 커뮤니티 확산</p>
+              </div>
+              <div class="text-right mr-4">
+                <span class="text-sm font-black rise">+15.1%</span>
+              </div>
+              <button onclick="alert('알잘딱깔센 종목 상세 페이지로 이동합니다.')" class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                상세 보기
+              </button>
+            </div>
+
+            <!-- 오운완 -->
+            <div class="stock-row flex items-center gap-4 px-6 py-4">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-dark">오운완</p>
+                <p class="text-[11px] text-gray-400">운동 인증 챌린지 재유행</p>
+              </div>
+              <div class="text-right mr-4">
+                <span class="text-sm font-black rise">+9.8%</span>
+              </div>
+              <button onclick="alert('오운완 종목 상세 페이지로 이동합니다.')" class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                상세 보기
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 우측: 차트 + 커뮤니티 -->
+        <div class="flex flex-col gap-6">
+
+          <!-- ⑦ 인기·언급량 추이 차트 -->
+          <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-base font-bold text-dark">밈 주식 인기 · 언급량 추이</h2>
+              <div class="flex gap-2 text-[10px] font-semibold">
+                <button class="px-2.5 py-1 bg-dark text-white rounded-md">7일</button>
+                <button class="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-md hover:bg-gray-200 transition-colors">30일</button>
+                <button class="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-md hover:bg-gray-200 transition-colors">90일</button>
+              </div>
+            </div>
+            <!-- 차트 범례 -->
+            <div class="flex gap-4 mb-3">
+              <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
+                <span class="w-3 h-0.5 bg-brand inline-block rounded"></span>인기 지수
+              </div>
+              <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
+                <span class="w-3 h-0.5 bg-purple-400 inline-block rounded"></span>언급량
+              </div>
+            </div>
+            <!-- Canvas -->
+            <div class="relative" style="height:200px;">
+              <canvas id="trendChart"></canvas>
+              <!-- X축 레이블 -->
+              <div class="absolute bottom-0 w-full flex justify-between text-[9px] text-gray-400 px-1">
+                <span>6/25</span><span>6/26</span><span>6/27</span><span>6/28</span><span>6/29</span><span>6/30</span><span>7/1</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑧ 주요 이슈 및 커뮤니티 반응 -->
+          <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100">
+              <h2 class="text-base font-bold text-dark">주요 이슈 및 커뮤니티 반응</h2>
+            </div>
+            <div class="divide-y divide-gray-50">
+
+              <div class="community-item flex items-start gap-3 px-6 py-4">
+                <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-[9px] font-black text-blue-600">유저</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-dark leading-relaxed">중꺾마 관련 트위터 언급량 3배 폭증</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">커뮤니티 반응 · <span class="text-gray-500">방금 전</span></p>
+                </div>
+                <span class="text-[9px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5">HOT</span>
+              </div>
+
+              <div class="community-item flex items-start gap-3 px-6 py-4">
+                <div class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-[9px] font-black text-orange-600">유저</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-dark leading-relaxed">킹받다, 10대 커뮤니티 중심 급확산 관측</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">디시인사이드 · <span class="text-gray-500">5분 전</span></p>
+                </div>
+              </div>
+
+              <div class="community-item flex items-start gap-3 px-6 py-4">
+                <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-[9px] font-black text-gray-500">유저</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-dark leading-relaxed">현타 콘텐츠 피로도 증가, 조정 국면 진입 예상</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">에펨코리아 · <span class="text-gray-500">12분 전</span></p>
+                </div>
+              </div>
+
+              <div class="community-item flex items-start gap-3 px-6 py-4">
+                <div class="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-[9px] font-black text-purple-600">유저</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold text-dark leading-relaxed">갓생, MZ세대 자기계발 콘텐츠 동반 급등</p>
+                  <p class="text-[10px] text-gray-400 mt-0.5">인스타그램 · <span class="text-gray-500">18분 전</span></p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 bg-white py-6 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ⑦ 인기·언급량 추이 차트
+    (function() {
+      const canvas = document.getElementById('trendChart');
+      const container = canvas.parentElement;
+
+      function draw() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = container.clientWidth;
+        const h = container.clientHeight - 16; // X축 레이블 공간 제외
+        canvas.width  = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width  = w + 'px';
+        canvas.style.height = h + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, w, h);
+
+        const padL = 8, padR = 8, padT = 8, padB = 20;
+        const chartW = w - padL - padR;
+        const chartH = h - padT - padB;
+
+        // 격자
+        ctx.strokeStyle = '#f3f4f6';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const y = padT + (chartH / 4) * i;
+          ctx.beginPath();
+          ctx.moveTo(padL, y);
+          ctx.lineTo(w - padR, y);
+          ctx.stroke();
+        }
+
+        // 인기 지수 데이터 (7일)
+        const popularityPts = [42, 55, 48, 70, 65, 85, 78];
+        // 언급량 데이터
+        const mentionPts    = [30, 40, 35, 55, 60, 72, 68];
+
+        function getXY(pts, i) {
+          const x = padL + (chartW / (pts.length - 1)) * i;
+          const max = Math.max(...pts);
+          const min = Math.min(...pts) * 0.8;
+          const y = padT + chartH - ((pts[i] - min) / (max - min)) * chartH;
+          return [x, y];
+        }
+
+        function drawLine(pts, color, fillColor) {
+          ctx.beginPath();
+          for (let i = 0; i < pts.length; i++) {
+            const [x, y] = getXY(pts, i);
+            i === 0 ? ctx.moveTo(x, y) : ctx.quadraticCurveTo(
+              getXY(pts, i-1)[0] + (x - getXY(pts, i-1)[0]) / 2,
+              getXY(pts, i-1)[1],
+              x, y
+            );
+          }
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.5;
+          ctx.lineJoin = 'round';
+          ctx.stroke();
+
+          // fill
+          const [lx, ly] = getXY(pts, pts.length - 1);
+          const [fx, fy] = getXY(pts, 0);
+          ctx.lineTo(lx, padT + chartH);
+          ctx.lineTo(fx, padT + chartH);
+          ctx.closePath();
+          ctx.fillStyle = fillColor;
+          ctx.fill();
+        }
+
+        // 언급량 (보라)
+        const gradMention = canvas.getContext('2d').createLinearGradient(0, 0, 0, h);
+        gradMention.addColorStop(0, 'rgba(167,139,250,0.2)');
+        gradMention.addColorStop(1, 'rgba(167,139,250,0)');
+        drawLine(mentionPts, '#a78bfa', gradMention);
+
+        // 인기 지수 (초록)
+        const gradPop = canvas.getContext('2d').createLinearGradient(0, 0, 0, h);
+        gradPop.addColorStop(0, 'rgba(0,255,0,0.2)');
+        gradPop.addColorStop(1, 'rgba(0,255,0,0)');
+        drawLine(popularityPts, '#00FF00', gradPop);
+
+        // 데이터 포인트 도트
+        [[popularityPts, '#00FF00'], [mentionPts, '#a78bfa']].forEach(([pts, col]) => {
+          pts.forEach((_, i) => {
+            const [x, y] = getXY(pts, i);
+            ctx.beginPath();
+            ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+            ctx.fillStyle = col;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          });
+        });
+      }
+
+      draw();
+      window.addEventListener('resize', draw);
+    })();
+  </script>
+</body>
+</html>

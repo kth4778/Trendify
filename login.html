@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>로그인 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+          },
+          borderRadius: {
+            '2xl': '20px',
+            '3xl': '30px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    input:focus {
+      outline: none;
+      border-color: #111111;
+      box-shadow: 0 0 0 2px rgba(17,17,17,0.08);
+    }
+    .social-link {
+      transition: color 0.15s ease;
+    }
+    .social-link:hover {
+      color: #111111;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="bg-white text-dark antialiased min-h-screen flex flex-col">
+
+  <!-- ① Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+
+        <!-- ① Trendify 로고 -->
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+
+        <!-- ② 상단 네비게이션 -->
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+
+        <!-- ③ 검색창 + ④ 프로필 버튼 -->
+        <div class="hidden md:flex items-center gap-3">
+          <!-- ③ 검색창 -->
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="검색"
+              class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-48 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"
+            />
+          </div>
+          <!-- ④ 프로필 버튼 -->
+          <a href="mypage.html" class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="hover:text-brand" href="dictionary.html">유행어 사전</a>
+          <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
+          <a class="hover:text-brand" href="vote.html">트렌드 투표</a>
+          <a class="hover:text-brand" href="upload.html">업로드</a>
+          <div class="relative mt-2">
+            <input type="text" placeholder="검색" class="w-full pl-4 pr-4 py-2 bg-gray-100 rounded-full text-sm border border-transparent focus:border-gray-300"/>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 px-4 sm:px-6 lg:px-8 py-16">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- ⑤ 로그인 폼 — 좌측 정렬 -->
+      <div class="max-w-md">
+
+        <!-- ⑤ 로그인 제목 -->
+        <h1 class="text-2xl font-bold text-dark mb-8">로그인</h1>
+
+        <!-- 폼 -->
+        <form onsubmit="handleLogin(event)" novalidate>
+
+          <!-- ⑥ 이메일 -->
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-dark mb-1.5" for="email">이메일</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-sm text-dark placeholder-gray-300 transition-colors"
+              placeholder=""
+            />
+            <p id="emailError" class="hidden mt-1.5 text-xs text-red-500">유효한 이메일 형식을 입력해주세요.</p>
+          </div>
+
+          <!-- ⑦ 비밀번호 -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-dark mb-1.5" for="password">비밀번호</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              autocomplete="current-password"
+              class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-sm text-dark placeholder-gray-300 transition-colors"
+              placeholder=""
+            />
+            <p id="passwordError" class="hidden mt-1.5 text-xs text-red-500">비밀번호를 입력해주세요.</p>
+          </div>
+
+          <!-- ⑧ 로그인 버튼 -->
+          <button
+            type="submit"
+            id="loginBtn"
+            class="w-full py-3.5 bg-dark text-white font-bold rounded-lg text-sm hover:bg-gray-800 active:bg-gray-900 transition-colors"
+          >
+            로그인
+          </button>
+
+          <!-- 오류 메시지 -->
+          <p id="loginError" class="hidden mt-3 text-xs text-center text-red-500">이메일 또는 비밀번호가 올바르지 않습니다.</p>
+        </form>
+
+        <!-- ⑨ 소셜 로그인 안내 -->
+        <div class="mt-8 mb-4">
+          <p class="text-sm text-gray-400">또는 소셜 계정으로 로그인</p>
+        </div>
+
+        <!-- ⑩ 소셜 로그인 링크 -->
+        <div class="flex flex-col gap-2">
+          <a href="#" class="social-link text-sm text-gray-500 w-fit">Google로 로그인</a>
+          <a href="#" class="social-link text-sm text-gray-500 w-fit">Naver로 로그인</a>
+          <a href="#" class="social-link text-sm text-gray-500 w-fit">Kakao로 로그인</a>
+        </div>
+
+        <!-- ⑪ 회원가입 링크 -->
+        <div class="mt-8">
+          <p class="text-sm text-gray-400">
+            계정이 없으신가요?
+            <a href="signup.html" class="font-bold text-dark hover:underline ml-1">회원가입</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function handleLogin(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+      const loginError = document.getElementById('loginError');
+
+      // reset
+      emailError.classList.add('hidden');
+      passwordError.classList.add('hidden');
+      loginError.classList.add('hidden');
+
+      let valid = true;
+
+      // ⑥ 이메일 유효성 검사
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        emailError.classList.remove('hidden');
+        document.getElementById('email').classList.add('border-red-400');
+        valid = false;
+      } else {
+        document.getElementById('email').classList.remove('border-red-400');
+      }
+
+      // ⑦ 비밀번호 필수 입력
+      if (!password) {
+        passwordError.classList.remove('hidden');
+        document.getElementById('password').classList.add('border-red-400');
+        valid = false;
+      } else {
+        document.getElementById('password').classList.remove('border-red-400');
+      }
+
+      if (!valid) return;
+
+      // ⑧ 로그인 성공 시 메인 페이지 이동 (mock)
+      // 실패 시나리오 시뮬레이션: 테스트용 더미 계정 외엔 실패 메시지
+      const MOCK_EMAIL = 'test@trendify.com';
+      const MOCK_PW = 'password123';
+
+      if (email === MOCK_EMAIL && password === MOCK_PW) {
+        window.location.href = 'index.html';
+      } else {
+        loginError.classList.remove('hidden');
+      }
+    }
+
+    // 입력 중 에러 초기화
+    document.getElementById('email').addEventListener('input', function() {
+      document.getElementById('emailError').classList.add('hidden');
+      this.classList.remove('border-red-400');
+    });
+    document.getElementById('password').addEventListener('input', function() {
+      document.getElementById('passwordError').classList.add('hidden');
+      this.classList.remove('border-red-400');
+    });
+  </script>
+</body>
+</html>

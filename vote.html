@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>트렌드 투표 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: '#00FF00', dark: '#111111' },
+          borderRadius: { '2xl': '20px', '3xl': '30px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+        "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* 대결 카드 */
+    .battle-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .battle-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px -10px rgba(0,0,0,0.12);
+    }
+
+    /* 투표 바 애니메이션 */
+    .vote-bar { transition: width 0.6s ease; }
+
+    /* 목록 행 */
+    .vote-row { transition: background 0.12s ease; }
+    .vote-row:hover { background: #f9fafb; }
+
+    /* 상태 배지 */
+    .badge-live   { background:#f0fdf4; color:#15803d; }
+    .badge-closed { background:#f3f4f6; color:#6b7280; }
+  </style>
+</head>
+<body class="bg-gray-50 text-dark antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+
+        <!-- ① 로고 -->
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+
+        <!-- ② 네비게이션 -->
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+
+        <!-- ③ 검색 + ④ 프로필 -->
+        <div class="hidden md:flex items-center gap-3">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <input type="text" placeholder="검색" class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-44 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"/>
+          </div>
+          <a href="mypage.html" class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </a>
+        </div>
+
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+                onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a href="dictionary.html">유행어 사전</a>
+          <a href="meme-stock.html">밈주식</a>
+          <a class="text-dark font-black" href="vote.html">트렌드 투표</a>
+          <a href="upload.html">업로드</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- 페이지 제목 + ⑤ 전체 투표 보기 -->
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-2xl font-black text-dark">트렌드 투표</h1>
+        <button onclick="alert('전체 대결 목록 페이지로 이동합니다.')"
+                class="px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition-colors">
+          전체 투표 보기
+        </button>
+      </div>
+      <p class="text-sm text-gray-400 mb-7">진행중인 투표</p>
+
+      <!-- ⑥ 이번 주 인기 대결 카드 3개 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+
+        <!-- 카드 1: 탕후루 vs 마라탕 -->
+        <div class="battle-card bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <p class="text-[10px] font-bold text-brand bg-dark inline-block px-2 py-0.5 rounded mb-3">이번 주 투표</p>
+          <h3 class="text-lg font-black text-dark mb-1">탕후루 vs 마라탕</h3>
+          <p class="text-xs text-gray-400 mb-5 leading-relaxed">디지트 트렌드의 양횽을 놓고 투표 중</p>
+
+          <!-- 투표 현황 바 -->
+          <div class="mb-4">
+            <div class="flex justify-between text-xs font-bold mb-1.5">
+              <span class="text-dark">탕후루</span>
+              <span class="text-dark">마라탕</span>
+            </div>
+            <div class="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="absolute left-0 top-0 h-full bg-brand rounded-full vote-bar" style="width:54%"></div>
+            </div>
+            <div class="flex justify-between text-sm font-black mt-1.5">
+              <span class="text-dark">54%</span>
+              <span class="text-xs font-bold text-gray-400 self-center">VS</span>
+              <span class="text-dark">46%</span>
+            </div>
+          </div>
+
+          <!-- ⑦ 지금 투표하기 버튼 -->
+          <button onclick="openVoteModal('탕후루 vs 마라탕', '탕후루', '마라탕')"
+                  class="w-full py-3 bg-dark text-white text-sm font-bold rounded-xl hover:bg-gray-800 active:bg-gray-900 transition-colors">
+            지금 투표하기
+          </button>
+        </div>
+
+        <!-- 카드 2: 뉴진스 vs 아이브 -->
+        <div class="battle-card bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <p class="text-[10px] font-bold text-brand bg-dark inline-block px-2 py-0.5 rounded mb-3">이번 주 투표</p>
+          <h3 class="text-lg font-black text-dark mb-1">뉴진스 vs 아이브</h3>
+          <p class="text-xs text-gray-400 mb-5 leading-relaxed">4세대 걸그룹 대표 아이돌 맞대결</p>
+
+          <div class="mb-4">
+            <div class="flex justify-between text-xs font-bold mb-1.5">
+              <span class="text-dark">뉴진스</span>
+              <span class="text-dark">아이브</span>
+            </div>
+            <div class="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="absolute left-0 top-0 h-full bg-brand rounded-full vote-bar" style="width:61%"></div>
+            </div>
+            <div class="flex justify-between text-sm font-black mt-1.5">
+              <span class="text-dark">61%</span>
+              <span class="text-xs font-bold text-gray-400 self-center">VS</span>
+              <span class="text-dark">39%</span>
+            </div>
+          </div>
+
+          <button onclick="openVoteModal('뉴진스 vs 아이브', '뉴진스', '아이브')"
+                  class="w-full py-3 bg-dark text-white text-sm font-bold rounded-xl hover:bg-gray-800 active:bg-gray-900 transition-colors">
+            지금 투표하기
+          </button>
+        </div>
+
+        <!-- 카드 3: ChatGPT vs Gemini -->
+        <div class="battle-card bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          <p class="text-[10px] font-bold text-brand bg-dark inline-block px-2 py-0.5 rounded mb-3">이번 주 투표</p>
+          <h3 class="text-lg font-black text-dark mb-1">ChatGPT vs Gemini</h3>
+          <p class="text-xs text-gray-400 mb-5 leading-relaxed">AI 어시스턴트 최강자는 누구?</p>
+
+          <div class="mb-4">
+            <div class="flex justify-between text-xs font-bold mb-1.5">
+              <span class="text-dark">ChatGPT</span>
+              <span class="text-dark">Gemini</span>
+            </div>
+            <div class="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="absolute left-0 top-0 h-full bg-brand rounded-full vote-bar" style="width:58%"></div>
+            </div>
+            <div class="flex justify-between text-sm font-black mt-1.5">
+              <span class="text-dark">58%</span>
+              <span class="text-xs font-bold text-gray-400 self-center">VS</span>
+              <span class="text-dark">42%</span>
+            </div>
+          </div>
+
+          <button onclick="openVoteModal('ChatGPT vs Gemini', 'ChatGPT', 'Gemini')"
+                  class="w-full py-3 bg-dark text-white text-sm font-bold rounded-xl hover:bg-gray-800 active:bg-gray-900 transition-colors">
+            지금 투표하기
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ⑧ 주요 투표 목록 -->
+      <div>
+        <h2 class="text-base font-bold text-dark mb-4">주요 투표 목록</h2>
+
+        <div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+
+          <!-- ⑨ 진행 중 항목 -->
+          <div class="vote-row flex items-center gap-4 px-6 py-4 border-b border-gray-50">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark">숏폼 vs 롱폼</p>
+            </div>
+            <span class="badge-live text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">진행 중</span>
+            <button onclick="openVoteModal('숏폼 vs 롱폼', '숏폼', '롱폼')"
+                    class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+              참여하기
+            </button>
+          </div>
+
+          <div class="vote-row flex items-center gap-4 px-6 py-4 border-b border-gray-50">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark">오픈런 vs 온라인 선착순</p>
+            </div>
+            <span class="badge-live text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">진행 중</span>
+            <button onclick="openVoteModal('오픈런 vs 온라인 선착순', '오픈런', '온라인 선착순')"
+                    class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+              참여하기
+            </button>
+          </div>
+
+          <div class="vote-row flex items-center gap-4 px-6 py-4 border-b border-gray-50">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark">제로슈거 vs 오리지널</p>
+            </div>
+            <span class="badge-live text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">진행 중</span>
+            <button onclick="openVoteModal('제로슈거 vs 오리지널', '제로슈거', '오리지널')"
+                    class="flex-shrink-0 px-4 py-2 bg-dark text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors">
+              참여하기
+            </button>
+          </div>
+
+          <!-- 마감 항목 -->
+          <div class="vote-row flex items-center gap-4 px-6 py-4 border-b border-gray-50">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-400">홈카페 vs 카페투어</p>
+            </div>
+            <span class="badge-closed text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">마감</span>
+            <button onclick="alert('홈카페 vs 카페투어 결과: 홈카페 63% vs 카페투어 37%')"
+                    class="flex-shrink-0 px-4 py-2 border border-gray-200 text-dark text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors">
+              결과 보기
+            </button>
+          </div>
+
+          <div class="vote-row flex items-center gap-4 px-6 py-4">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-400">미니멀리즘 vs 맥시멀리즘 인테리어</p>
+            </div>
+            <span class="badge-closed text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">마감</span>
+            <button onclick="alert('미니멀리즘 vs 맥시멀리즘 결과: 미니멀리즘 71% vs 맥시멀리즘 29%')"
+                    class="flex-shrink-0 px-4 py-2 border border-gray-200 text-dark text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors">
+              결과 보기
+            </button>
+          </div>
+
+        </div>
+
+        <!-- ⑩ 투표 주제 업로드 버튼 -->
+        <div class="mt-5">
+          <button onclick="alert('투표 주제 제안 페이지로 이동합니다.')"
+                  class="px-6 py-3 bg-dark text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors">
+            투표 주제 업로드
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 bg-white py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 투표 모달 -->
+  <div id="voteModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <!-- 배경 오버레이 -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeVoteModal()"></div>
+
+    <!-- 모달 카드 -->
+    <div class="relative bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl">
+      <button onclick="closeVoteModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <p class="text-[11px] font-bold text-gray-400 mb-1">투표하기</p>
+      <h3 id="modalTitle" class="text-xl font-black text-dark mb-6"></h3>
+
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <button id="btnA"
+                onclick="castVote('A')"
+                class="py-4 rounded-2xl border-2 border-gray-200 text-sm font-bold text-dark hover:border-brand hover:bg-green-50 transition-all active:scale-95">
+        </button>
+        <button id="btnB"
+                onclick="castVote('B')"
+                class="py-4 rounded-2xl border-2 border-gray-200 text-sm font-bold text-dark hover:border-brand hover:bg-green-50 transition-all active:scale-95">
+        </button>
+      </div>
+
+      <!-- 결과 영역 (투표 후 표시) -->
+      <div id="voteResult" class="hidden">
+        <div class="flex justify-between text-xs font-bold mb-1.5">
+          <span id="resLabelA"></span>
+          <span id="resLabelB"></span>
+        </div>
+        <div class="relative h-3 bg-gray-100 rounded-full overflow-hidden mb-1.5">
+          <div id="resBar" class="absolute left-0 top-0 h-full bg-brand rounded-full transition-all duration-700" style="width:0%"></div>
+        </div>
+        <div class="flex justify-between text-sm font-black">
+          <span id="resPctA" class="text-dark"></span>
+          <span id="resPctB" class="text-dark"></span>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-4">투표해 주셔서 감사합니다! 🎉</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentVote = { title: '', a: '', b: '' };
+
+    function openVoteModal(title, a, b) {
+      currentVote = { title, a, b };
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('btnA').textContent = a;
+      document.getElementById('btnB').textContent = b;
+      document.getElementById('voteResult').classList.add('hidden');
+      document.getElementById('btnA').disabled = false;
+      document.getElementById('btnB').disabled = false;
+      document.getElementById('btnA').classList.remove('border-brand', 'bg-green-50');
+      document.getElementById('btnB').classList.remove('border-brand', 'bg-green-50');
+
+      const modal = document.getElementById('voteModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeVoteModal() {
+      const modal = document.getElementById('voteModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function castVote(side) {
+      // 버튼 비활성화
+      document.getElementById('btnA').disabled = true;
+      document.getElementById('btnB').disabled = true;
+
+      // 선택 강조
+      const chosen = side === 'A' ? 'btnA' : 'btnB';
+      document.getElementById(chosen).classList.add('border-brand', 'bg-green-50');
+
+      // 임의 결과 계산 (선택 쪽이 약간 높게)
+      const pctA = side === 'A'
+        ? Math.floor(Math.random() * 20) + 52
+        : Math.floor(Math.random() * 20) + 28;
+      const pctB = 100 - pctA;
+
+      document.getElementById('resLabelA').textContent = currentVote.a;
+      document.getElementById('resLabelB').textContent = currentVote.b;
+      document.getElementById('resPctA').textContent = pctA + '%';
+      document.getElementById('resPctB').textContent = pctB + '%';
+
+      const result = document.getElementById('voteResult');
+      result.classList.remove('hidden');
+
+      // 바 애니메이션
+      setTimeout(() => {
+        document.getElementById('resBar').style.width = pctA + '%';
+      }, 50);
+    }
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeVoteModal();
+    });
+  </script>
+</body>
+</html>

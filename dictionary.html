@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>유행어 사전 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+          },
+          borderRadius: {
+            '2xl': '20px',
+            '3xl': '30px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 2px;
+      background: #00FF00;
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    .popular-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .popular-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12);
+    }
+
+    .dict-row {
+      transition: background 0.12s ease;
+    }
+    .dict-row:hover { background: #f9fafb; }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 30px !important;
+    }
+
+    .filter-chip {
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .filter-chip.active {
+      background: #111111;
+      color: #ffffff;
+    }
+    .filter-chip:not(.active):hover {
+      background: #f3f4f6;
+    }
+  </style>
+</head>
+<body class="bg-white text-dark antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+
+        <!-- ① 로고 -->
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+
+        <!-- ② 네비게이션 -->
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+
+        <!-- ③ 검색창 + ④ 프로필 -->
+        <div class="hidden md:flex items-center gap-3">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+              </svg>
+            </div>
+            <input type="text" placeholder="검색" class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-44 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"/>
+          </div>
+          <a href="mypage.html" class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors flex-shrink-0">
+            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </a>
+        </div>
+
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="text-dark font-black" href="dictionary.html">유행어 사전</a>
+          <a href="meme-stock.html">밈주식</a>
+          <a href="vote.html">트렌드 투표</a>
+          <a href="upload.html">업로드</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- ⑤ 페이지 제목 + ⑥ 유행어 등록하기 버튼 -->
+      <div class="flex items-center justify-between mb-7">
+        <h1 class="text-2xl font-black text-dark">유행어 사전</h1>
+        <a href="upload.html" class="px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition-colors">
+          유행어 등록하기
+        </a>
+      </div>
+
+      <!-- ⑦⑧⑨ 검색 + 필터 바 -->
+      <div class="flex flex-wrap items-center gap-3 mb-5">
+        <!-- ⑦ 본문 검색창 -->
+        <div class="relative flex-1 min-w-[200px] max-w-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+          </div>
+          <input
+            id="dictSearch"
+            type="text"
+            placeholder="검색"
+            oninput="filterDict()"
+            class="block w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-dark transition-colors"
+          />
+        </div>
+
+        <!-- ⑧ 카테고리 드롭다운 -->
+        <div class="flex flex-col">
+          <label class="text-[10px] text-gray-400 mb-1 ml-1">카테고리</label>
+          <select onchange="filterDict()" id="catFilter" class="pl-3 py-2.5 border border-gray-200 rounded-xl text-sm text-dark focus:outline-none focus:border-dark cursor-pointer bg-white min-w-[100px]">
+            <option value="전체">전체</option>
+            <option value="SNS">SNS</option>
+            <option value="커뮤니티">커뮤니티</option>
+            <option value="밈">밈</option>
+            <option value="신조어">신조어</option>
+          </select>
+        </div>
+
+        <!-- ⑨ 정렬 드롭다운 -->
+        <div class="flex flex-col">
+          <label class="text-[10px] text-gray-400 mb-1 ml-1">정렬</label>
+          <select onchange="filterDict()" id="sortFilter" class="pl-3 py-2.5 border border-gray-200 rounded-xl text-sm text-dark focus:outline-none focus:border-dark cursor-pointer bg-white min-w-[100px]">
+            <option>최신순</option>
+            <option>인기순</option>
+            <option>좋아요순</option>
+            <option>가나다순</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ⑩ 서브 필터 칩 -->
+      <div class="flex flex-wrap gap-2 mb-8">
+        <button class="filter-chip active px-4 py-1.5 rounded-full text-sm font-semibold border border-gray-200" onclick="setChip(this)">전체</button>
+        <button class="filter-chip px-4 py-1.5 rounded-full text-sm font-semibold border border-gray-200 text-gray-600" onclick="setChip(this)">오늘의 핫</button>
+        <button class="filter-chip px-4 py-1.5 rounded-full text-sm font-semibold border border-gray-200 text-gray-600" onclick="setChip(this)">신규 등록</button>
+        <button class="filter-chip px-4 py-1.5 rounded-full text-sm font-semibold border border-gray-200 text-gray-600" onclick="setChip(this)">에디터 픽</button>
+        <button class="filter-chip px-4 py-1.5 rounded-full text-sm font-semibold border border-gray-200 text-gray-600" onclick="setChip(this)">논란중</button>
+      </div>
+
+      <!-- ⑪ 인기 유행어 -->
+      <div class="mb-8">
+        <h2 class="text-base font-bold text-dark mb-4">인기 유행어</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+          <!-- ⑫ 카드 1 — 갓생 -->
+          <div class="popular-card bg-white border border-gray-100 rounded-2xl p-6 shadow-sm cursor-pointer" onclick="alert('갓생 상세 페이지로 이동합니다.')">
+            <h3 class="text-lg font-black text-dark mb-2">갓생</h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-5">
+              갓(God) + 생(인생). 매우 부지런하고 생산적인 삶을 사는 것을 의미한다.
+            </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="flex items-center gap-1 text-xs font-semibold text-orange-500">
+                🔥 인기 1위
+              </span>
+              <span class="flex items-center gap-1 text-xs font-semibold text-rose-500">
+                ♥ 2.4k
+              </span>
+              <button onclick="event.stopPropagation(); alert('링크가 복사되었습니다!')" class="ml-auto px-3 py-1.5 border border-gray-200 text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
+                공유
+              </button>
+            </div>
+          </div>
+
+          <!-- 카드 2 — 스불재 -->
+          <div class="popular-card bg-white border border-gray-100 rounded-2xl p-6 shadow-sm cursor-pointer" onclick="alert('스불재 상세 페이지로 이동합니다.')">
+            <h3 class="text-lg font-black text-dark mb-2">스불재</h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-5">
+              스스로 불러온 재앙의 줄임말. 자신이 원인이 된 안 좋은 상황을 이를 때 쓴다.
+            </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="flex items-center gap-1 text-xs font-semibold text-orange-500">
+                🔥 인기 2위
+              </span>
+              <span class="flex items-center gap-1 text-xs font-semibold text-rose-500">
+                ♥ 1.8k
+              </span>
+              <button onclick="event.stopPropagation(); alert('링크가 복사되었습니다!')" class="ml-auto px-3 py-1.5 border border-gray-200 text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
+                공유
+              </button>
+            </div>
+          </div>
+
+          <!-- 카드 3 — 억텐 -->
+          <div class="popular-card bg-white border border-gray-100 rounded-2xl p-6 shadow-sm cursor-pointer" onclick="alert('억텐 상세 페이지로 이동합니다.')">
+            <h3 class="text-lg font-black text-dark mb-2">억텐</h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-5">
+              억지로 텐션을 높인다는 뜻. 분위기를 맞추려 억지로 활기차게 구는 것.
+            </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="flex items-center gap-1 text-xs font-semibold text-orange-500">
+                🔥 인기 3위
+              </span>
+              <span class="flex items-center gap-1 text-xs font-semibold text-rose-500">
+                ♥ 1.2k
+              </span>
+              <button onclick="event.stopPropagation(); alert('링크가 복사되었습니다!')" class="ml-auto px-3 py-1.5 border border-gray-200 text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
+                공유
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ⑬ 전체 유행어 목록 -->
+      <div>
+        <h2 class="text-base font-bold text-dark mb-4">전체 유행어 목록</h2>
+
+        <div class="border border-gray-100 rounded-2xl overflow-hidden" id="dictList">
+
+          <!-- 킹받다 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="킹받다" data-desc="매우 열받고 짜증나는 상황을 표현하는 신조어. '킹'은 강조 정도사로 쓰인다." data-cat="SNS">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">킹받다</p>
+              <p class="text-xs text-gray-400 leading-relaxed">매우 열받고 짜증나는 상황을 표현하는 신조어. '킹'은 강조 정도사로 쓰인다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">SNS</span>
+            <a href="#" onclick="alert('킹받다 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 알잘딱깔센 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="알잘딱깔센" data-desc="알아서 잘 딱 깔끔하고 센스있게의 줄임말. 눈치껏 잘 처리해 달라는 의미다." data-cat="커뮤니티">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">알잘딱깔센</p>
+              <p class="text-xs text-gray-400 leading-relaxed">알아서 잘 딱 깔끔하고 센스있게의 줄임말. 눈치껏 잘 처리해 달라는 의미다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">커뮤니티</span>
+            <a href="#" onclick="alert('알잘딱깔센 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 오저완 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="오저완" data-desc="오늘 저녁은 완전 좋아의 줄임말. 저녁 식사나 일상의 소소한 행복을 표현할 때 쓴다." data-cat="SNS">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">오저완</p>
+              <p class="text-xs text-gray-400 leading-relaxed">오늘 저녁은 완전 좋아의 줄임말. 저녁 식사나 일상의 소소한 행복을 표현할 때 쓴다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">SNS</span>
+            <a href="#" onclick="alert('오저완 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 현타 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="현타" data-desc="현실 자각 타임의 줄임말. 꿈에서 깨어나 현실을 직시하게 되는 순간을 뜻한다." data-cat="밈">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">현타</p>
+              <p class="text-xs text-gray-400 leading-relaxed">현실 자각 타임의 줄임말. 꿈에서 깨어나 현실을 직시하게 되는 순간을 뜻한다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">밈</span>
+            <a href="#" onclick="alert('현타 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 중꺾마 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="중꺾마" data-desc="중요한 건 꺾이지 않는 마음의 줄임말. 포기하지 않는 정신을 표현할 때 쓴다." data-cat="SNS">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">중꺾마</p>
+              <p class="text-xs text-gray-400 leading-relaxed">중요한 건 꺾이지 않는 마음의 줄임말. 포기하지 않는 정신을 표현할 때 쓴다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">SNS</span>
+            <a href="#" onclick="alert('중꺾마 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 너뭐돼 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="너뭐돼" data-desc="상대방의 실력이나 능력에 놀랐을 때 쓰는 감탄 표현. 드라마 대사에서 유래했다." data-cat="밈">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">너뭐돼</p>
+              <p class="text-xs text-gray-400 leading-relaxed">상대방의 실력이나 능력에 놀랐을 때 쓰는 감탄 표현. 드라마 대사에서 유래했다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">밈</span>
+            <a href="#" onclick="alert('너뭐돼 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 오운완 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="오운완" data-desc="오늘 운동 완료의 줄임말. SNS에서 운동 인증 문화와 함께 확산된 신조어." data-cat="신조어">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">오운완</p>
+              <p class="text-xs text-gray-400 leading-relaxed">오늘 운동 완료의 줄임말. SNS에서 운동 인증 문화와 함께 확산된 신조어.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">신조어</span>
+            <a href="#" onclick="alert('오운완 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 폼미쳤다 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5 border-b border-gray-50"
+               data-word="폼미쳤다" data-desc="컨디션이나 실력이 매우 좋은 상태를 표현하는 말. 스포츠·연예 분야에서 주로 쓰인다." data-cat="커뮤니티">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">폼미쳤다</p>
+              <p class="text-xs text-gray-400 leading-relaxed">컨디션이나 실력이 매우 좋은 상태를 표현하는 말. 스포츠·연예 분야에서 주로 쓰인다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">커뮤니티</span>
+            <a href="#" onclick="alert('폼미쳤다 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 내또출근 -->
+          <div class="dict-row dict-item flex items-center gap-4 px-6 py-5"
+               data-word="내또출근" data-desc="내일 또 출근의 줄임말. 직장인이 월요일 증후군이나 퇴근 직후 허탈감을 표현할 때 쓴다." data-cat="SNS">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-dark mb-0.5">내또출근</p>
+              <p class="text-xs text-gray-400 leading-relaxed">내일 또 출근의 줄임말. 직장인이 월요일 증후군이나 퇴근 직후 허탈감을 표현할 때 쓴다.</p>
+            </div>
+            <span class="text-[11px] text-gray-400 flex-shrink-0 mr-4 hidden sm:block">SNS</span>
+            <a href="#" onclick="alert('내또출근 상세 페이지로 이동합니다.'); return false;" class="text-xs font-bold text-dark hover:underline flex-shrink-0">자세히 보기</a>
+          </div>
+
+          <!-- 검색 결과 없음 -->
+          <div id="noResult" class="hidden px-6 py-10 text-center text-sm text-gray-400">
+            검색 결과가 없습니다.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 bg-white py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ⑩ 서브 필터 칩 토글
+    function setChip(el) {
+      document.querySelectorAll('.filter-chip').forEach(c => {
+        c.classList.remove('active');
+        c.classList.add('text-gray-600');
+      });
+      el.classList.add('active');
+      el.classList.remove('text-gray-600');
+      filterDict();
+    }
+
+    // ⑦⑧ 실시간 검색 + 카테고리 필터
+    function filterDict() {
+      const query  = document.getElementById('dictSearch').value.trim().toLowerCase();
+      const cat    = document.getElementById('catFilter').value;
+      const items  = document.querySelectorAll('.dict-item');
+      let visible  = 0;
+
+      items.forEach(item => {
+        const word = item.dataset.word.toLowerCase();
+        const desc = item.dataset.desc.toLowerCase();
+        const itemCat = item.dataset.cat;
+
+        const matchQuery = !query || word.includes(query) || desc.includes(query);
+        const matchCat   = cat === '전체' || itemCat === cat;
+
+        if (matchQuery && matchCat) {
+          item.classList.remove('hidden');
+          visible++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      document.getElementById('noResult').classList.toggle('hidden', visible > 0);
+    }
+  </script>
+</body>
+</html>
