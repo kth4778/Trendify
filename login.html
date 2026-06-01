@@ -12,10 +12,11 @@
           colors: {
             brand: '#00FF00',
             dark: '#111111',
+            surface: '#F9FAFB',
           },
           borderRadius: {
-            '2xl': '20px',
-            '3xl': '30px',
+            '2xl': '18px',
+            '3xl': '24px',
           }
         }
       }
@@ -25,6 +26,7 @@
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     body {
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background-color: #F9FAFB;
     }
     .nav-link {
       position: relative;
@@ -42,17 +44,30 @@
     .nav-link:hover::after {
       width: 100%;
     }
+    .login-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #ffffff;
+      border: 2px solid transparent;
+    }
+    .login-card:hover {
+      box-shadow: 0 40px 80px -20px rgba(0, 255, 0, 0.1);
+      border-color: #00FF00;
+      transform: translateY(-4px);
+    }
     input:focus {
       outline: none;
-      border-color: #111111;
-      box-shadow: 0 0 0 2px rgba(17,17,17,0.08);
+      border-color: #00FF00;
+      box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.1);
     }
     .social-link {
-      transition: color 0.15s ease;
+      transition: all 0.2s ease;
     }
     .social-link:hover {
-      color: #111111;
+      color: #00FF00;
       text-decoration: underline;
+    }
+    .hero-gradient {
+      background: linear-gradient(135deg, #00FF00 0%, #00CCFF 100%);
     }
   </style>
 </head>
@@ -122,15 +137,20 @@
     </nav>
   </header>
 
+  <div class="hero-gradient py-12 px-4 sm:px-6 lg:px-8 text-dark">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl font-black mb-2">Welcome Back</h1>
+      <p class="text-dark/60 font-medium">Trendify의 더 많은 기능을 즐겨보세요</p>
+    </div>
+  </div>
+
   <!-- Main Content -->
-  <main class="flex-1 px-4 sm:px-6 lg:px-8 py-16">
+  <main class="flex-1 px-4 sm:px-6 lg:px-8 py-16 -mt-8">
     <div class="max-w-7xl mx-auto">
 
-      <!-- ⑤ 로그인 폼 — 좌측 정렬 -->
-      <div class="max-w-md">
-
-        <!-- ⑤ 로그인 제목 -->
-        <h1 class="text-2xl font-bold text-dark mb-8">로그인</h1>
+      <!-- ⑤ 로그인 폼 — 유리 질감 카드 적용 -->
+      <div class="max-w-md bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-white/50 shadow-xl login-card">
+        <h2 class="text-2xl font-bold text-dark mb-8">로그인</h2>
 
         <!-- 폼 -->
         <form onsubmit="handleLogin(event)" novalidate>

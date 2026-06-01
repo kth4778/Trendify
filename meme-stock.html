@@ -12,10 +12,11 @@
           colors: {
             brand: '#00FF00',
             dark: '#111111',
+            surface: '#F9FAFB',
           },
           borderRadius: {
-            '2xl': '20px',
-            '3xl': '30px',
+            '2xl': '18px',
+            '3xl': '24px',
           }
         }
       }
@@ -25,6 +26,7 @@
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     body {
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background-color: #F9FAFB;
     }
     .nav-link { position: relative; }
     .nav-link::after {
@@ -37,21 +39,35 @@
     }
     .nav-link:hover::after { width: 100%; }
 
-    .stock-row {
-      transition: background 0.15s ease;
+    .stock-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #ffffff;
+      border: 2px solid transparent;
     }
-    .stock-row:hover { background: #f9fafb; }
+    .stock-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px -10px rgba(0, 255, 0, 0.1);
+      border-color: #00FF00;
+    }
+
+    .stock-row {
+      transition: all 0.2s ease;
+    }
+    .stock-row:hover { 
+      background: #F0FFF0;
+      transform: scale(1.01);
+    }
 
     .mini-bar {
       height: 6px;
       border-radius: 3px;
-      background: #e5e7eb;
+      background: #F3F4F6;
       overflow: hidden;
     }
     .mini-bar-fill {
       height: 100%;
       border-radius: 3px;
-      background: linear-gradient(90deg, #d1d5db, #9ca3af);
+      background: linear-gradient(90deg, #E5E7EB, #D1D5DB);
     }
 
     .ticker-wrap { overflow: hidden; white-space: nowrap; }
@@ -64,13 +80,16 @@
       100% { transform: translateX(-50%); }
     }
 
-    .rise  { color: #16a34a; }
-    .fall  { color: #dc2626; }
+    .rise  { color: #16A34A; }
+    .fall  { color: #DC2626; }
 
     .community-item {
       transition: background 0.15s;
     }
-    .community-item:hover { background: #f9fafb; }
+    .community-item:hover { background: #F9FAFB; }
+    .hero-gradient {
+      background: linear-gradient(135deg, #00FF00 0%, #00CCFF 100%);
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-dark antialiased min-h-screen flex flex-col">
@@ -148,11 +167,20 @@
     </nav>
   </header>
 
-  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="hero-gradient py-12 px-4 sm:px-6 lg:px-8 text-dark">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl font-black mb-2">밈 주식 대시보드</h1>
+      <p class="text-dark/60 font-medium">실시간 트렌드 가치 분석 및 시장 지수</p>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8 -mt-8">
     <div class="max-w-7xl mx-auto">
 
       <!-- 브레드크럼 -->
-      <p class="text-sm text-gray-500 mb-6">밈 주식 대시보드</p>
+      <div class="bg-white/50 backdrop-blur-md px-4 py-2 rounded-full inline-block border border-white/30 shadow-sm mb-6">
+        <p class="text-xs font-bold text-dark/70 uppercase tracking-wider">Meme Stock Market</p>
+      </div>
 
       <!-- ⑤ 핵심 지표 요약 카드 4개 -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

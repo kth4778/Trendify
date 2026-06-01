@@ -12,10 +12,11 @@
           colors: {
             brand: '#00FF00',
             dark: '#111111',
+            surface: '#F9FAFB',
           },
           borderRadius: {
-            '2xl': '20px',
-            '3xl': '30px',
+            '2xl': '18px',
+            '3xl': '24px',
           }
         }
       }
@@ -25,6 +26,10 @@
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     body {
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background-color: #F9FAFB;
+    }
+    .hero-gradient {
+      background: linear-gradient(135deg, #00FF00 0%, #00CCFF 100%);
     }
     .nav-link { position: relative; }
     .nav-link::after {
@@ -38,17 +43,20 @@
     .nav-link:hover::after { width: 100%; }
 
     .popular-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #ffffff;
+      border: 2px solid transparent;
     }
     .popular-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 30px 60px -12px rgba(0, 255, 0, 0.15);
+      border-color: #00FF00;
     }
 
     .dict-row {
       transition: background 0.12s ease;
     }
-    .dict-row:hover { background: #f9fafb; }
+    .dict-row:hover { background: #F9FAFB; }
 
     select {
       appearance: none;
@@ -61,14 +69,18 @@
 
     .filter-chip {
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      transition: all 0.2s ease;
+      border: 1px solid #E5E7EB;
     }
     .filter-chip.active {
       background: #111111;
       color: #ffffff;
+      border-color: #111111;
     }
     .filter-chip:not(.active):hover {
-      background: #f3f4f6;
+      background: #F9FAFB;
+      border-color: #00FF00;
+      color: #00FF00;
     }
   </style>
 </head>
@@ -126,12 +138,19 @@
     </nav>
   </header>
 
-  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="hero-gradient py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl font-black text-dark mb-2">유행어 사전</h1>
+      <p class="text-dark/60 font-medium">지금 가장 핫한 밈의 모든 것</p>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8 -mt-8">
     <div class="max-w-7xl mx-auto">
 
       <!-- ⑤ 페이지 제목 + ⑥ 유행어 등록하기 버튼 -->
-      <div class="flex items-center justify-between mb-7">
-        <h1 class="text-2xl font-black text-dark">유행어 사전</h1>
+      <div class="flex items-center justify-between mb-7 bg-white/50 backdrop-blur-md p-4 rounded-3xl border border-white/30 shadow-sm">
+        <h2 class="text-xl font-bold text-dark">트렌드 탐색</h2>
         <a href="upload.html" class="px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition-colors">
           유행어 등록하기
         </a>

@@ -9,8 +9,15 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: { brand: '#00FF00', dark: '#111111' },
-          borderRadius: { '2xl': '20px', '3xl': '30px' }
+          colors: {
+            brand: '#00FF00',
+            dark: '#111111',
+            surface: '#F9FAFB',
+          },
+          borderRadius: {
+            '2xl': '18px',
+            '3xl': '24px',
+          }
         }
       }
     }
@@ -18,8 +25,8 @@
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     body {
-      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto,
-        "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      background-color: #F9FAFB;
     }
     .nav-link { position: relative; }
     .nav-link::after {
@@ -34,11 +41,14 @@
 
     /* 대결 카드 */
     .battle-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #ffffff;
+      border: 2px solid transparent;
     }
     .battle-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 40px -10px rgba(0,0,0,0.12);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 30px 60px -12px rgba(0, 255, 0, 0.15);
+      border-color: #00FF00;
     }
 
     /* 투표 바 애니메이션 */
@@ -46,11 +56,14 @@
 
     /* 목록 행 */
     .vote-row { transition: background 0.12s ease; }
-    .vote-row:hover { background: #f9fafb; }
+    .vote-row:hover { background: #F9FAFB; }
 
     /* 상태 배지 */
-    .badge-live   { background:#f0fdf4; color:#15803d; }
-    .badge-closed { background:#f3f4f6; color:#6b7280; }
+    .badge-live   { background:#F0FDF4; color:#15803D; }
+    .badge-closed { background:#F3F4F6; color:#6B7280; }
+    .hero-gradient {
+      background: linear-gradient(135deg, #00FF00 0%, #00CCFF 100%);
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-dark antialiased min-h-screen flex flex-col">
@@ -108,18 +121,24 @@
     </nav>
   </header>
 
-  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="hero-gradient py-12 px-4 sm:px-6 lg:px-8 text-dark">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl font-black mb-2">트렌드 투표</h1>
+      <p class="text-dark/60 font-medium">당신의 선택이 곧 다음 유행이 됩니다</p>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8 -mt-8">
     <div class="max-w-7xl mx-auto">
 
       <!-- 페이지 제목 + ⑤ 전체 투표 보기 -->
-      <div class="flex items-center justify-between mb-2">
-        <h1 class="text-2xl font-black text-dark">트렌드 투표</h1>
+      <div class="flex items-center justify-between mb-7 bg-white/50 backdrop-blur-md p-4 rounded-3xl border border-white/30 shadow-sm">
+        <h2 class="text-xl font-bold text-dark">진행중인 대결</h2>
         <button onclick="alert('전체 대결 목록 페이지로 이동합니다.')"
-                class="px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition-colors">
+                class="px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors">
           전체 투표 보기
         </button>
       </div>
-      <p class="text-sm text-gray-400 mb-7">진행중인 투표</p>
 
       <!-- ⑥ 이번 주 인기 대결 카드 3개 -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
