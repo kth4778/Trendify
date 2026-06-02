@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>제보 상세 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body{font-family:"Pretendard",sans-serif;}
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .hero-gradient{background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%)}
+    .step-line{position:relative}.step-line:not(:last-child)::after{content:'';position:absolute;left:15px;top:36px;width:2px;height:calc(100% + 16px);background:#e5e7eb}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3 text-xs font-medium text-gray-500">
+        <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+        <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-dark/60 mb-3 flex items-center gap-2">
+      <a href="mypage.html" class="hover:text-dark">마이페이지</a><span>›</span>
+      <a href="my-reports.html" class="hover:text-dark">제보 내역</a><span>›</span>
+      <span class="text-dark font-bold" id="reportTitle">제보 상세</span>
+    </nav>
+    <div class="flex items-center gap-3">
+      <h1 class="text-4xl font-black text-dark" id="titleEl">중꺾마</h1>
+      <span class="px-3 py-1 bg-dark text-brand text-xs font-black rounded-full" id="statusBadge">등록 완료</span>
+    </div>
+    <p class="text-dark/60 text-sm mt-2" id="subTitle">제보일 2024.01.10 · 유행어</p>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto space-y-6">
+
+    <!-- 검수 현황 타임라인 -->
+    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+      <h2 class="text-base font-bold text-dark mb-6">검수 진행 현황</h2>
+      <div class="space-y-4" id="timeline">
+        <!-- JS로 채움 -->
+      </div>
+    </div>
+
+    <!-- 제보 내용 -->
+    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+      <h2 class="text-base font-bold text-dark mb-5">제보 내용</h2>
+      <div class="space-y-4 text-sm" id="reportContent">
+        <!-- JS로 채움 -->
+      </div>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="flex gap-3">
+      <a href="my-reports.html" class="flex-1 py-3.5 bg-gray-100 text-dark font-bold rounded-xl text-sm text-center hover:bg-gray-200 transition-all">← 목록으로</a>
+      <a href="report-form.html" class="flex-1 py-3.5 bg-brand text-dark font-bold rounded-xl text-sm text-center hover:brightness-90 transition-all">+ 새 제보하기</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const REPORTS = {
+  '1': { title:'중꺾마', status:'done', statusLabel:'등록 완료', sub:'제보일 2024.01.10 · 유행어', category:'MZ어', short:'중요한 건 꺾이지 않는 마음', detail:'어떤 어려움이나 역경에도 포기하지 않는 마음가짐을 뜻하는 신조어입니다.', example:'"요즘 너무 힘들지만 중꺾마! 끝까지 해보자."', tags:['#MZ','#긍정','#도전'],
+    timeline:[{done:true,label:'제보 접수',desc:'2024.01.10 14:23','color':'bg-brand text-dark'},{done:true,label:'내용 검토',desc:'2024.01.11 09:00','color':'bg-brand text-dark'},{done:true,label:'최종 승인',desc:'2024.01.12 15:30','color':'bg-brand text-dark'},{done:true,label:'사전 등록 완료',desc:'2024.01.13 10:00','color':'bg-brand text-dark'}] },
+  '4': { title:'알잘딱깔센', status:'review', statusLabel:'검토 중', sub:'제보일 2024.04.20 · 유행어', category:'MZ어', short:'알아서 잘 딱 깔끔하고 센스있게', detail:'말하지 않아도 상대방이 알아서 센스있게 행동해주길 바라는 표현입니다.', example:'"팀플은 역시 알잘딱깔센인 사람이랑 해야 해."', tags:['#MZ','#직장','#소통'],
+    timeline:[{done:true,label:'제보 접수',desc:'2024.04.20 11:00','color':'bg-brand text-dark'},{done:true,label:'1차 검토',desc:'2024.04.21 09:30','color':'bg-brand text-dark'},{done:false,label:'내용 보완 요청',desc:'진행 중','color':'bg-yellow-400 text-dark'},{done:false,label:'최종 승인',desc:'대기 중','color':'bg-gray-200 text-gray-400'}] },
+  '7': { title:'너무 어려운 신조어 테스트', status:'reject', statusLabel:'반려', sub:'제보일 2024.04.10 · 기타', category:'기타', short:'신조어 테스트 밈', detail:'출처가 불명확한 신조어 테스트 관련 밈입니다.', example:'-', tags:['#테스트'],
+    timeline:[{done:true,label:'제보 접수',desc:'2024.04.10 15:00','color':'bg-brand text-dark'},{done:true,label:'1차 검토',desc:'2024.04.11 10:00','color':'bg-brand text-dark'},{done:true,label:'반려 처리',desc:'2024.04.12 · 출처 불명확, 사용 사례 부족','color':'bg-red-400 text-white'},{done:false,label:'사전 등록',desc:'반려됨','color':'bg-gray-200 text-gray-400'}] },
+};
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id') || '1';
+const d = REPORTS[id] || REPORTS['1'];
+
+document.getElementById('titleEl').textContent = d.title;
+document.getElementById('reportTitle').textContent = d.title;
+document.getElementById('subTitle').textContent = d.sub;
+const badge = document.getElementById('statusBadge');
+badge.textContent = d.statusLabel;
+badge.className = 'px-3 py-1 text-xs font-black rounded-full ' + (d.status==='done'?'bg-brand text-dark':d.status==='review'?'bg-yellow-400 text-dark':'bg-red-400 text-white');
+document.title = d.title + ' 제보 상세 - Trendify';
+
+// 타임라인
+const tl = document.getElementById('timeline');
+tl.innerHTML = d.timeline.map((step, i) => `
+  <div class="step-line flex items-start gap-4 pb-4">
+    <div class="w-8 h-8 rounded-full ${step.done ? step.color : 'bg-gray-200 text-gray-400'} flex items-center justify-center text-sm font-black flex-shrink-0 z-10 relative">${step.done?'✓':i+1}</div>
+    <div class="pt-1">
+      <p class="text-sm font-bold ${step.done?'text-dark':'text-gray-400'}">${step.label}</p>
+      <p class="text-xs text-gray-400 mt-0.5">${step.desc}</p>
+    </div>
+  </div>`).join('');
+
+// 제보 내용
+const rc = document.getElementById('reportContent');
+rc.innerHTML = [
+  ['분류', d.category],
+  ['한 줄 설명', d.short],
+  ['상세 설명', d.detail],
+  ['예문', d.example],
+  ['태그', d.tags.join(' ')],
+].map(([k,v]) => `
+  <div class="flex gap-4 py-3 border-b border-gray-50 last:border-0">
+    <span class="text-gray-400 w-20 flex-shrink-0">${k}</span>
+    <span class="font-medium text-dark">${v}</span>
+  </div>`).join('');
+
+function logout() { localStorage.removeItem('isLoggedIn'); window.location.href='index.html'; }
+</script>
+</body>
+</html>

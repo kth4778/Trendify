@@ -138,9 +138,16 @@
           <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
         </div>
         <div class="hidden md:flex items-center space-x-4 text-xs font-medium text-gray-500">
-          <a class="hover:text-dark transition-colors" href="login.html">로그인</a>
-          <a class="hover:text-dark transition-colors" href="signup.html">회원가입</a>
-          <a class="px-4 py-2 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors" href="mypage.html">마이페이지</a>
+          <!-- 비로그인 상태 -->
+          <div id="authLoggedOut" class="flex items-center space-x-4">
+            <a class="hover:text-dark transition-colors" href="login.html">로그인</a>
+            <a class="hover:text-dark transition-colors" href="signup.html">회원가입</a>
+          </div>
+          <!-- 로그인 상태 -->
+          <div id="authLoggedIn" class="hidden flex items-center space-x-3">
+            <a class="px-4 py-2 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors" href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="hover:text-dark transition-colors">로그아웃</button>
+          </div>
         </div>
         <!-- Mobile Menu Button -->
         <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="toggleMobileMenu()">
@@ -156,9 +163,13 @@
           <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
           <a class="hover:text-brand" href="vote.html">트렌드 투표</a>
           <a class="hover:text-brand" href="upload.html">업로드</a>
-          <div class="flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+          <div id="mobileAuthLoggedOut" class="flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
             <a href="login.html">로그인</a>
             <a href="signup.html">회원가입</a>
+          </div>
+          <div id="mobileAuthLoggedIn" class="hidden flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="text-gray-500">로그아웃</button>
           </div>
         </div>
       </div>
@@ -612,6 +623,22 @@
 
     drawChart();
     window.addEventListener('resize', drawChart);
+  </script>
+
+  <script>
+    // 로그인 상태 반영
+    function updateAuthUI() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      document.getElementById('authLoggedOut').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('authLoggedIn').classList.toggle('hidden', !isLoggedIn);
+      document.getElementById('mobileAuthLoggedOut').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('mobileAuthLoggedIn').classList.toggle('hidden', !isLoggedIn);
+    }
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      updateAuthUI();
+    }
+    updateAuthUI();
   </script>
 </body>
 </html>

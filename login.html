@@ -250,7 +250,7 @@
 
       // ⑥ 이메일 유효성 검사
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email || !emailRegex.test(email)) {
+      if (!email || (!emailRegex.test(email) && email !== '1234')) {
         emailError.classList.remove('hidden');
         document.getElementById('email').classList.add('border-red-400');
         valid = false;
@@ -271,10 +271,11 @@
 
       // ⑧ 로그인 성공 시 메인 페이지 이동 (mock)
       // 실패 시나리오 시뮬레이션: 테스트용 더미 계정 외엔 실패 메시지
-      const MOCK_EMAIL = 'test@trendify.com';
-      const MOCK_PW = 'password123';
+      const MOCK_EMAIL = '1234';
+      const MOCK_PW = '1234';
 
       if (email === MOCK_EMAIL && password === MOCK_PW) {
+        localStorage.setItem('isLoggedIn', 'true');
         window.location.href = 'index.html';
       } else {
         loginError.classList.remove('hidden');

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>종목 상세 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family:"Pretendard",sans-serif; }
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .hero-gradient{background:linear-gradient(135deg,#111 0%,#222 100%)}
+    .tab-btn { transition:all .2s; }
+    .tab-btn.active { background:#00FF00; color:#111; }
+    .stat-card { transition:all .3s; }
+    .stat-card:hover { transform:translateY(-2px); box-shadow:0 10px 20px -5px rgba(0,0,0,.08); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+        <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3">
+        <div id="authLoggedOut" class="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="login.html" class="hover:text-dark">로그인</a><a href="signup.html" class="hover:text-dark">회원가입</a>
+        </div>
+        <div id="authLoggedIn" class="hidden flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+          <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+        </div>
+      </div>
+      <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mob').classList.toggle('hidden')">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mob" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4 flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+      <a href="dictionary.html">유행어 사전</a><a href="meme-stock.html">밈주식</a><a href="vote.html">트렌드 투표</a><a href="upload.html">업로드</a>
+    </div>
+  </nav>
+</header>
+
+<!-- 종목 헤더 -->
+<div class="hero-gradient text-white py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-white/50 mb-4 flex items-center gap-2">
+      <a href="meme-stock.html" class="hover:text-white">밈주식</a><span>›</span><span class="text-white" id="stockName">중꺾마</span>
+    </nav>
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-3 mb-1">
+          <h1 class="text-4xl font-black" id="stockTitle">중꺾마</h1>
+          <span class="px-3 py-1 bg-brand text-dark text-xs font-black rounded-full" id="stockTicker">JKM</span>
+        </div>
+        <p class="text-white/60 text-sm" id="stockDesc">중요한 건 꺾이지 않는 마음 · MZ어 종목</p>
+      </div>
+      <div class="text-right">
+        <p class="text-3xl font-black" id="stockPrice">₩ 12,480</p>
+        <p class="text-sm font-bold text-green-400" id="stockChange">▲ +1,240 (+11.0%)</p>
+        <p class="text-xs text-white/40 mt-1">2024.06.02 기준</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- 주요 지표 -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <p class="text-xs text-gray-400 mb-1">시가총액</p>
+        <p class="text-xl font-black text-dark" id="marketCap">₩ 1.24조</p>
+      </div>
+      <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <p class="text-xs text-gray-400 mb-1">거래량 (24h)</p>
+        <p class="text-xl font-black text-dark">423,891</p>
+      </div>
+      <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <p class="text-xs text-gray-400 mb-1">52주 최고</p>
+        <p class="text-xl font-black text-dark">₩ 15,200</p>
+      </div>
+      <div class="stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <p class="text-xs text-gray-400 mb-1">트렌드 점수</p>
+        <p class="text-xl font-black text-brand">98점</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- 차트 + 탭 -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-base font-bold text-dark">가격 추이</h2>
+            <div class="flex gap-2">
+              <button class="tab-btn active px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600" onclick="setTab(this,'1W')">1주</button>
+              <button class="tab-btn px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600" onclick="setTab(this,'1M')">1달</button>
+              <button class="tab-btn px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600" onclick="setTab(this,'3M')">3달</button>
+            </div>
+          </div>
+          <canvas id="stockChart" height="200"></canvas>
+        </div>
+
+        <!-- 종목 정보 -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <h2 class="text-base font-bold text-dark mb-4">종목 정보</h2>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">분류</span><span class="font-medium text-dark">MZ어 / 응원·격려</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">상장일</span><span class="font-medium text-dark">2022.11.08</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">발행 주수</span><span class="font-medium text-dark">100,000,000</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">SNS 언급량</span><span class="font-medium text-brand">+34% ↑</span></div>
+            <div class="flex justify-between py-2"><span class="text-gray-500">투자 위험도</span><span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">낮음</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 사이드: 매매 패널 -->
+      <div class="space-y-6">
+        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm sticky top-24">
+          <h2 class="text-base font-bold text-dark mb-5">가상 매매</h2>
+          <div class="flex gap-2 mb-5">
+            <button class="flex-1 py-2.5 bg-brand text-dark font-bold rounded-xl text-sm" id="buyBtn" onclick="goTrade('buy')">구매</button>
+            <button class="flex-1 py-2.5 bg-gray-100 text-dark font-bold rounded-xl text-sm" id="sellBtn" onclick="goTrade('sell')">판매</button>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">현재가</span><span class="font-bold text-dark" id="sidePrice">₩ 12,480</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">보유 수량</span><span class="font-medium text-dark">0주</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">평가 손익</span><span class="font-medium text-gray-400">-</span></div>
+          </div>
+          <div class="mt-5 p-3 bg-gray-50 rounded-xl text-xs text-gray-400 leading-relaxed">
+            💡 가상 자산으로 실제 금전적 가치가 없습니다. 트렌드 체험용 시뮬레이션입니다.
+          </div>
+        </div>
+
+        <!-- 커뮤니티 반응 -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <h3 class="text-sm font-bold text-dark mb-4">커뮤니티 반응</h3>
+          <div class="space-y-3">
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-dark text-xs font-black flex-shrink-0">J</div>
+              <div>
+                <p class="text-xs font-bold text-dark">중꺾마 레전드 ㅋㅋ</p>
+                <p class="text-xs text-gray-400 mt-0.5">지금도 안 죽고 살아있네 이 단어</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-full bg-blue-200 flex items-center justify-center text-dark text-xs font-black flex-shrink-0">K</div>
+              <div>
+                <p class="text-xs font-bold text-dark">강력 매수 추천</p>
+                <p class="text-xs text-gray-400 mt-0.5">월드컵 때마다 부활해서 계속 오름</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-full bg-red-200 flex items-center justify-center text-dark text-xs font-black flex-shrink-0">M</div>
+              <div>
+                <p class="text-xs font-bold text-dark">장기보유 각</p>
+                <p class="text-xs text-gray-400 mt-0.5">국민 유행어 되기 직전인듯</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+    <div class="flex gap-6"><a class="hover:text-dark" href="#">이용약관</a><a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a></div>
+  </div>
+</footer>
+
+<script>
+// URL 파라미터로 종목 정보 동적 로드
+const STOCKS = {
+  '중꺾마': { title:'중꺾마', ticker:'JKM', desc:'중요한 건 꺾이지 않는 마음 · MZ어 종목', price:'₩ 12,480', change:'▲ +1,240 (+11.0%)', changePos:true, cap:'₩ 1.24조', data:[8200,8900,9400,9100,10200,11000,10800,11500,12000,11800,12480] },
+  '갓생': { title:'갓생', ticker:'GDS', desc:'부지런한 삶의 방식 · 라이프스타일 종목', price:'₩ 9,750', change:'▲ +620 (+6.8%)', changePos:true, cap:'₩ 9,750억', data:[7000,7200,7800,8100,8400,8800,9000,9200,9400,9600,9750] },
+  '킹받다': { title:'킹받다', ticker:'KNG', desc:'매우 화가 나다 · 감정표현 종목', price:'₩ 7,320', change:'▼ -180 (-2.4%)', changePos:false, cap:'₩ 7,320억', data:[8500,8200,8000,7800,7600,7400,7500,7300,7200,7400,7320] },
+  '현타': { title:'현타', ticker:'HNT', desc:'현실 자각 타임 · 감성 종목', price:'₩ 5,890', change:'▲ +390 (+7.1%)', changePos:true, cap:'₩ 5,890억', data:[4200,4500,4800,5000,5200,5400,5600,5700,5800,5820,5890] },
+  '알잘딱깔센': { title:'알잘딱깔센', ticker:'AJDK', desc:'알아서 잘 딱 깔끔하고 센스있게 · MZ어 종목', price:'₩ 4,250', change:'▲ +210 (+5.2%)', changePos:true, cap:'₩ 4,250억', data:[3000,3200,3400,3600,3700,3900,4000,4100,4150,4200,4250] },
+  '오운완': { title:'오운완', ticker:'OWW', desc:'오늘 운동 완료 · 갓생 종목', price:'₩ 6,120', change:'▼ -80 (-1.3%)', changePos:false, cap:'₩ 6,120억', data:[6500,6400,6300,6200,6100,6050,6000,6100,6150,6200,6120] },
+};
+
+const params = new URLSearchParams(location.search);
+const key = params.get('stock') || '중꺾마';
+const d = STOCKS[key] || STOCKS['중꺾마'];
+
+document.getElementById('stockName').textContent = d.title;
+document.getElementById('stockTitle').textContent = d.title;
+document.getElementById('stockTicker').textContent = d.ticker;
+document.getElementById('stockDesc').textContent = d.desc;
+document.getElementById('stockPrice').textContent = d.price;
+document.getElementById('sidePrice').textContent = d.price;
+document.title = d.title + ' 종목 상세 - Trendify';
+const changeEl = document.getElementById('stockChange');
+changeEl.textContent = d.change;
+changeEl.className = 'text-sm font-bold ' + (d.changePos ? 'text-green-400' : 'text-red-400');
+
+// 차트
+function drawChart(data) {
+  const canvas = document.getElementById('stockChart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 200 * window.devicePixelRatio;
+  canvas.style.height = '200px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 200;
+  const min = Math.min(...data) * 0.95;
+  const max = Math.max(...data) * 1.05;
+  const pad = { t:20, r:20, b:30, l:60 };
+  const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+  const sx = i => pad.l + (i / (data.length-1)) * cw;
+  const sy = v => pad.t + (1 - (v - min) / (max - min)) * ch;
+  ctx.clearRect(0, 0, W, H);
+  // grid
+  ctx.strokeStyle = '#f3f4f6'; ctx.lineWidth = 1;
+  for (let i=0;i<4;i++) { const y = pad.t + (ch/3)*i; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke(); }
+  // gradient fill
+  const grad = ctx.createLinearGradient(0, pad.t, 0, H-pad.b);
+  grad.addColorStop(0, 'rgba(0,255,0,0.3)');
+  grad.addColorStop(1, 'rgba(0,255,0,0)');
+  ctx.beginPath();
+  ctx.moveTo(sx(0), sy(data[0]));
+  data.forEach((v,i) => ctx.lineTo(sx(i), sy(v)));
+  ctx.lineTo(sx(data.length-1), H-pad.b);
+  ctx.lineTo(sx(0), H-pad.b);
+  ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  // line
+  ctx.beginPath(); ctx.strokeStyle = '#00FF00'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  data.forEach((v,i) => i===0 ? ctx.moveTo(sx(i),sy(v)) : ctx.lineTo(sx(i),sy(v)));
+  ctx.stroke();
+  // y-axis labels
+  ctx.fillStyle = '#9ca3af'; ctx.font = '11px Pretendard, sans-serif'; ctx.textAlign = 'right';
+  [min, (min+max)/2, max].forEach(v => {
+    const y = sy(v);
+    ctx.fillText('₩'+Math.round(v).toLocaleString(), pad.l-6, y+4);
+  });
+}
+
+drawChart(d.data);
+window.addEventListener('resize', () => drawChart(d.data));
+
+function setTab(btn, period) {
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active','bg-brand','text-dark'); b.classList.add('bg-gray-100','text-gray-600'); });
+  btn.classList.add('active'); btn.classList.remove('bg-gray-100','text-gray-600');
+  const variations = { '1W': d.data, '1M': d.data.map((v,i) => v * (0.85 + i*0.015)), '3M': d.data.map(v => v * 0.7 + Math.random()*1000) };
+  drawChart(variations[period] || d.data);
+}
+
+function goTrade(type) {
+  window.location.href = `stock-trade.html?stock=${encodeURIComponent(key)}&type=${type}`;
+}
+
+function updateAuthUI() {
+  const ok = localStorage.getItem('isLoggedIn')==='true';
+  document.getElementById('authLoggedOut').classList.toggle('hidden',ok);
+  document.getElementById('authLoggedIn').classList.toggle('hidden',!ok);
+}
+function logout() { localStorage.removeItem('isLoggedIn'); updateAuthUI(); }
+updateAuthUI();
+</script>
+</body>
+</html>

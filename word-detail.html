@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>유행어 상세 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: '#00FF00', dark: '#111111', surface: '#F9FAFB' }, borderRadius: { '2xl': '18px', '3xl': '24px' } } }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family: "Pretendard", sans-serif; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:#00FF00; transition:width .2s; }
+    .nav-link { position:relative; }
+    .nav-link:hover::after { width:100%; }
+    .hero-gradient { background: linear-gradient(135deg, #00FF00 0%, #00CCFF 100%); }
+    .tag-chip { transition: all .2s; }
+    .tag-chip:hover { background:#111; color:#00FF00; }
+    .related-card { transition: all .3s; border: 2px solid transparent; }
+    .related-card:hover { border-color:#00FF00; transform:translateY(-4px); box-shadow:0 20px 40px -10px rgba(0,255,0,.15); }
+    .copy-toast { display:none; position:fixed; bottom:2rem; left:50%; transform:translateX(-50%); background:#111; color:#fff; padding:.75rem 1.5rem; border-radius:9999px; font-size:.8rem; z-index:100; }
+    .copy-toast.show { display:block; animation: fadeInOut 2s forwards; }
+    @keyframes fadeInOut { 0%{opacity:0} 15%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
+    .trend-bar { transition: width 1s ease; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand transition-colors font-bold text-dark border-b-2 border-dark pb-0.5" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3">
+        <div id="authLoggedOut" class="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="login.html" class="hover:text-dark">로그인</a>
+          <a href="signup.html" class="hover:text-dark">회원가입</a>
+        </div>
+        <div id="authLoggedIn" class="hidden flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors">마이페이지</a>
+          <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+        </div>
+      </div>
+      <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mob').classList.toggle('hidden')">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mob" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4 flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+      <a href="dictionary.html">유행어 사전</a><a href="meme-stock.html">밈주식</a><a href="vote.html">트렌드 투표</a><a href="upload.html">업로드</a>
+    </div>
+  </nav>
+</header>
+
+<!-- Hero -->
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs font-medium text-dark/60 mb-4 flex items-center gap-2">
+      <a href="dictionary.html" class="hover:text-dark">유행어 사전</a>
+      <span>›</span><span class="text-dark font-bold" id="breadWord">유행어 상세</span>
+    </nav>
+    <div class="flex items-start gap-4">
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="text-4xl font-black text-dark" id="wordTitle">중꺾마</h1>
+          <span class="px-3 py-1 bg-dark text-brand text-xs font-bold rounded-full" id="wordCategory">MZ어</span>
+          <span class="px-3 py-1 bg-white/30 text-dark text-xs font-bold rounded-full" id="wordRank">#1 인기</span>
+        </div>
+        <p class="text-dark/60 text-sm font-medium" id="wordEng">중요한 건 꺾이지 않는 마음</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- 왼쪽: 메인 콘텐츠 -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- 정의 카드 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+          <h2 class="text-lg font-bold text-dark mb-4">📖 정의</h2>
+          <p class="text-gray-700 leading-relaxed text-base" id="wordDef">
+            어떤 어려움이나 역경이 있어도 포기하지 않고 끝까지 나아가는 마음가짐을 뜻하는 신조어. 넷플릭스 드라마 「D.P.」 등에서 사용된 후 MZ세대를 중심으로 급격히 확산되었다.
+          </p>
+          <div class="mt-6 p-4 bg-gray-50 rounded-2xl border-l-4 border-brand">
+            <p class="text-xs font-bold text-gray-400 mb-1">예문</p>
+            <p class="text-sm text-gray-700 italic" id="wordExample">
+              "요즘 너무 힘들지만 중꺾마! 끝까지 해보자."
+            </p>
+          </div>
+        </div>
+
+        <!-- 유래 카드 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+          <h2 class="text-lg font-bold text-dark mb-4">🧬 유래</h2>
+          <p class="text-gray-700 leading-relaxed" id="wordOrigin">
+            2022년 리그 오브 레전드 월드 챔피언십에서 한국 팀 T1의 경기 이후 팬들 사이에서 퍼지기 시작했다. 이후 각종 SNS와 커뮤니티에서 응원·격려의 맥락으로 널리 사용되며 MZ 세대의 대표 표현으로 자리잡았다.
+          </p>
+          <div class="flex gap-2 mt-5 flex-wrap" id="wordTags">
+            <span class="tag-chip px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full cursor-pointer">#긍정</span>
+            <span class="tag-chip px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full cursor-pointer">#도전</span>
+            <span class="tag-chip px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full cursor-pointer">#MZ</span>
+            <span class="tag-chip px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full cursor-pointer">#게임</span>
+            <span class="tag-chip px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full cursor-pointer">#SNS유행</span>
+          </div>
+        </div>
+
+        <!-- 트렌드 지수 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+          <h2 class="text-lg font-bold text-dark mb-6">📊 트렌드 지수</h2>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm font-medium mb-2"><span class="text-gray-600">인스타그램</span><span class="text-dark font-bold">92%</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="trend-bar h-full bg-brand rounded-full" style="width:0%" data-w="92%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium mb-2"><span class="text-gray-600">트위터/X</span><span class="text-dark font-bold">78%</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="trend-bar h-full bg-blue-400 rounded-full" style="width:0%" data-w="78%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium mb-2"><span class="text-gray-600">유튜브</span><span class="text-dark font-bold">65%</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="trend-bar h-full bg-red-400 rounded-full" style="width:0%" data-w="65%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-medium mb-2"><span class="text-gray-600">디시인사이드</span><span class="text-dark font-bold">85%</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="trend-bar h-full bg-yellow-400 rounded-full" style="width:0%" data-w="85%"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 오른쪽: 사이드바 -->
+      <div class="space-y-6">
+
+        <!-- 액션 버튼 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+          <div class="flex flex-col gap-3">
+            <button onclick="copyWord()" class="w-full py-3 bg-brand text-dark font-bold rounded-xl text-sm hover:brightness-90 transition-all">
+              🔗 링크 복사
+            </button>
+            <button onclick="toggleBookmark(this)" class="w-full py-3 bg-gray-100 text-dark font-bold rounded-xl text-sm hover:bg-gray-200 transition-all" id="bookmarkBtn">
+              ☆ 관심 트렌드 저장
+            </button>
+            <a href="upload.html" class="w-full py-3 bg-dark text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition-all text-center block">
+              ✍️ 밈 제보하기
+            </a>
+          </div>
+        </div>
+
+        <!-- 기본 정보 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+          <h3 class="text-sm font-bold text-dark mb-4">정보</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">등록일</span><span class="font-medium text-dark">2022.11.08</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">분류</span><span class="font-medium text-dark">신조어 · MZ어</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">조회수</span><span class="font-medium text-dark">128,432</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">저장수</span><span class="font-medium text-dark">9,821</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">트렌드 점수</span><span class="font-bold text-brand">98점</span></div>
+          </div>
+        </div>
+
+        <!-- 관련 유행어 -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+          <h3 class="text-sm font-bold text-dark mb-4">관련 유행어</h3>
+          <div class="space-y-3">
+            <a href="word-detail.html?word=갓생" class="related-card block bg-gray-50 rounded-xl p-3 cursor-pointer">
+              <p class="text-sm font-bold text-dark">갓생</p>
+              <p class="text-xs text-gray-400 mt-0.5">부지런하고 성실한 삶의 방식</p>
+            </a>
+            <a href="word-detail.html?word=킹받다" class="related-card block bg-gray-50 rounded-xl p-3 cursor-pointer">
+              <p class="text-sm font-bold text-dark">킹받다</p>
+              <p class="text-xs text-gray-400 mt-0.5">매우 열 받거나 화가 나다</p>
+            </a>
+            <a href="word-detail.html?word=현타" class="related-card block bg-gray-50 rounded-xl p-3 cursor-pointer">
+              <p class="text-sm font-bold text-dark">현타</p>
+              <p class="text-xs text-gray-400 mt-0.5">현실 자각 타임의 줄임말</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- 링크 복사 토스트 -->
+<div id="copyToast" class="copy-toast">🔗 링크가 클립보드에 복사되었습니다!</div>
+
+<!-- Footer -->
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+    <div class="flex gap-6"><a class="hover:text-dark" href="#">이용약관</a><a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a></div>
+  </div>
+</footer>
+
+<script>
+// URL 파라미터로 단어 정보 동적 로드
+const WORDS = {
+  '중꺾마': { title:'중꺾마', eng:'중요한 건 꺾이지 않는 마음', category:'MZ어', rank:'#1 인기', def:'어떤 어려움이나 역경이 있어도 포기하지 않고 끝까지 나아가는 마음가짐을 뜻하는 신조어. 넷플릭스 드라마 「D.P.」 등에서 사용된 후 MZ세대를 중심으로 급격히 확산되었다.', example:'"요즘 너무 힘들지만 중꺾마! 끝까지 해보자."', origin:'2022년 리그 오브 레전드 월드 챔피언십에서 한국 팀 T1의 경기 이후 팬들 사이에서 퍼지기 시작했다. 이후 각종 SNS와 커뮤니티에서 응원·격려의 맥락으로 널리 사용되며 MZ 세대의 대표 표현으로 자리잡았다.', tags:['#긍정','#도전','#MZ','#게임','#SNS유행'] },
+  '갓생': { title:'갓생', eng:'God + 생 (삶)', category:'신조어', rank:'#2 인기', def:"'갓(God)'과 '생(삶)'이 합쳐진 말로, 신처럼 완벽하고 부지런하게 사는 삶을 뜻한다. 일찍 일어나 운동하고, 공부하고, 자기 계발을 꾸준히 하는 라이프스타일을 묘사한다.", example:'"오늘도 새벽 5시 기상, 운동, 독서 완료! 갓생 살고 있어 나"', origin:"2020년대 초반 유튜브와 인스타그램을 통해 '갓생 챌린지'가 유행하면서 널리 퍼졌다.", tags:['#자기계발','#부지런','#MZ','#챌린지'] },
+  '킹받다': { title:'킹받다', eng:'King + 받다 (화나다)', category:'MZ어', rank:'#3 인기', def:"'열받다'를 강조한 신조어로 매우 화가 나거나 짜증스러운 상태를 표현한다. '킹'이 접두사로 붙어 강도를 높인 표현.", example:'"야 진짜 킹받아, 왜 나한테만 이래?"', origin:"2021년 트위터 등 SNS에서 등장하여 빠르게 퍼진 표현.", tags:['#화남','#짜증','#MZ','#감정표현'] },
+  '현타': { title:'현타', eng:'현실 자각 타임', category:'줄임말', rank:'#4 인기', def:"'현실 자각 타임'의 줄임말. 즐겁거나 들떠있다가 갑자기 현실을 직시하게 되는 순간, 혹은 허무함을 느끼는 상태를 말한다.", example:'"여행 끝나고 집에 오니까 현타 오네..."', origin:"2010년대 후반 온라인 커뮤니티에서 시작해 SNS로 확산되었다.", tags:['#허무','#현실','#감정','#줄임말'] },
+};
+
+const params = new URLSearchParams(location.search);
+const key = params.get('word') || '중꺾마';
+const data = WORDS[key] || WORDS['중꺾마'];
+
+document.getElementById('wordTitle').textContent = data.title;
+document.getElementById('breadWord').textContent = data.title;
+document.getElementById('wordEng').textContent = data.eng;
+document.getElementById('wordCategory').textContent = data.category;
+document.getElementById('wordRank').textContent = data.rank;
+document.getElementById('wordDef').textContent = data.def;
+document.getElementById('wordExample').textContent = data.example;
+document.getElementById('wordOrigin').textContent = data.origin;
+document.title = data.title + ' - Trendify';
+
+const tagsEl = document.getElementById('wordTags');
+tagsEl.innerHTML = data.tags.map(t => `<span class="tag-chip px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full cursor-pointer">${t}</span>`).join('');
+
+// 트렌드 바 애니메이션
+setTimeout(() => {
+  document.querySelectorAll('.trend-bar').forEach(bar => {
+    bar.style.width = bar.dataset.w;
+  });
+}, 300);
+
+// 링크 복사
+function copyWord() {
+  navigator.clipboard.writeText(location.href).then(() => {
+    const t = document.getElementById('copyToast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+// 관심 트렌드 저장 토글
+function toggleBookmark(btn) {
+  const saved = btn.dataset.saved === 'true';
+  if (saved) {
+    btn.textContent = '☆ 관심 트렌드 저장';
+    btn.dataset.saved = 'false';
+    btn.classList.remove('bg-brand','text-dark');
+    btn.classList.add('bg-gray-100','text-dark');
+  } else {
+    btn.textContent = '★ 관심 트렌드 저장됨';
+    btn.dataset.saved = 'true';
+    btn.classList.remove('bg-gray-100');
+    btn.classList.add('bg-brand','text-dark');
+  }
+}
+
+// 로그인 상태
+function updateAuthUI() {
+  const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  document.getElementById('authLoggedOut').classList.toggle('hidden', loggedIn);
+  document.getElementById('authLoggedIn').classList.toggle('hidden', !loggedIn);
+}
+function logout() { localStorage.removeItem('isLoggedIn'); updateAuthUI(); }
+updateAuthUI();
+</script>
+</body>
+</html>

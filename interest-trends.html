@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>관심 트렌드 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body{font-family:"Pretendard",sans-serif;}
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .hero-gradient{background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%)}
+    .trend-card{transition:all .3s;border:2px solid transparent}
+    .trend-card:hover{border-color:#00FF00;transform:translateY(-4px);box-shadow:0 20px 40px -10px rgba(0,255,0,.15)}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3 text-xs font-medium text-gray-500">
+        <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+        <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-dark/60 mb-3 flex items-center gap-2">
+      <a href="mypage.html" class="hover:text-dark">마이페이지</a><span>›</span><span class="text-dark font-bold">관심 트렌드</span>
+    </nav>
+    <h1 class="text-4xl font-black text-dark mb-2">관심 트렌드</h1>
+    <p class="text-dark/60 text-sm">저장한 트렌드와 팔로우 중인 키워드</p>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- 필터 탭 -->
+    <div class="flex gap-3 mb-8 overflow-x-auto pb-2">
+      <button onclick="filterTab(this,'all')" class="filter-tab flex-shrink-0 px-5 py-2 bg-dark text-white rounded-full text-sm font-bold">전체</button>
+      <button onclick="filterTab(this,'word')" class="filter-tab flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-gray-400">유행어</button>
+      <button onclick="filterTab(this,'meme')" class="filter-tab flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-gray-400">밈</button>
+      <button onclick="filterTab(this,'stock')" class="filter-tab flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-gray-400">밈주식</button>
+    </div>
+
+    <!-- 관심 트렌드 그리드 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="trendGrid">
+
+      <a href="word-detail.html?word=중꺾마" class="trend-card bg-white rounded-3xl p-6 border border-gray-100 shadow-sm block" data-type="word">
+        <div class="flex items-start justify-between mb-4">
+          <span class="text-3xl">🔥</span>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">유행어</span>
+            <button onclick="removeSaved(event,this)" class="text-gray-300 hover:text-red-400 text-lg">★</button>
+          </div>
+        </div>
+        <h3 class="text-xl font-black text-dark mb-1">중꺾마</h3>
+        <p class="text-sm text-gray-500 mb-4">중요한 건 꺾이지 않는 마음</p>
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>저장일 2024.01.15</span>
+          <span class="text-brand font-bold">트렌드 98점</span>
+        </div>
+      </a>
+
+      <a href="word-detail.html?word=갓생" class="trend-card bg-white rounded-3xl p-6 border border-gray-100 shadow-sm block" data-type="word">
+        <div class="flex items-start justify-between mb-4">
+          <span class="text-3xl">✨</span>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">유행어</span>
+            <button onclick="removeSaved(event,this)" class="text-gray-300 hover:text-red-400 text-lg">★</button>
+          </div>
+        </div>
+        <h3 class="text-xl font-black text-dark mb-1">갓생</h3>
+        <p class="text-sm text-gray-500 mb-4">신처럼 부지런하고 완벽한 삶</p>
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>저장일 2024.02.03</span>
+          <span class="text-brand font-bold">트렌드 91점</span>
+        </div>
+      </a>
+
+      <a href="stock-detail.html?stock=중꺾마" class="trend-card bg-white rounded-3xl p-6 border border-gray-100 shadow-sm block" data-type="stock">
+        <div class="flex items-start justify-between mb-4">
+          <span class="text-3xl">📈</span>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">밈주식</span>
+            <button onclick="removeSaved(event,this)" class="text-gray-300 hover:text-red-400 text-lg">★</button>
+          </div>
+        </div>
+        <h3 class="text-xl font-black text-dark mb-1">중꺾마 (JKM)</h3>
+        <p class="text-sm text-gray-500 mb-4">₩ 12,480 ▲ +11.0%</p>
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>저장일 2024.03.10</span>
+          <span class="text-green-500 font-bold">+11.0%</span>
+        </div>
+      </a>
+
+      <a href="word-detail.html?word=킹받다" class="trend-card bg-white rounded-3xl p-6 border border-gray-100 shadow-sm block" data-type="word">
+        <div class="flex items-start justify-between mb-4">
+          <span class="text-3xl">👑</span>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">유행어</span>
+            <button onclick="removeSaved(event,this)" class="text-gray-300 hover:text-red-400 text-lg">★</button>
+          </div>
+        </div>
+        <h3 class="text-xl font-black text-dark mb-1">킹받다</h3>
+        <p class="text-sm text-gray-500 mb-4">매우 열 받고 화가 나다</p>
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>저장일 2024.03.22</span>
+          <span class="text-brand font-bold">트렌드 85점</span>
+        </div>
+      </a>
+
+      <a href="stock-detail.html?stock=갓생" class="trend-card bg-white rounded-3xl p-6 border border-gray-100 shadow-sm block" data-type="stock">
+        <div class="flex items-start justify-between mb-4">
+          <span class="text-3xl">💹</span>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">밈주식</span>
+            <button onclick="removeSaved(event,this)" class="text-gray-300 hover:text-red-400 text-lg">★</button>
+          </div>
+        </div>
+        <h3 class="text-xl font-black text-dark mb-1">갓생 (GDS)</h3>
+        <p class="text-sm text-gray-500 mb-4">₩ 9,750 ▲ +6.8%</p>
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>저장일 2024.04.01</span>
+          <span class="text-green-500 font-bold">+6.8%</span>
+        </div>
+      </a>
+
+      <a href="word-detail.html?word=현타" class="trend-card bg-white rounded-3xl p-6 border border-gray-100 shadow-sm block" data-type="word">
+        <div class="flex items-start justify-between mb-4">
+          <span class="text-3xl">😮‍💨</span>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">유행어</span>
+            <button onclick="removeSaved(event,this)" class="text-gray-300 hover:text-red-400 text-lg">★</button>
+          </div>
+        </div>
+        <h3 class="text-xl font-black text-dark mb-1">현타</h3>
+        <p class="text-sm text-gray-500 mb-4">현실 자각 타임의 줄임말</p>
+        <div class="flex items-center justify-between text-xs text-gray-400">
+          <span>저장일 2024.04.15</span>
+          <span class="text-brand font-bold">트렌드 79점</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- 빈 상태 -->
+    <div id="emptyState" class="hidden text-center py-20">
+      <div class="text-6xl mb-4">🔖</div>
+      <h3 class="text-lg font-black text-dark mb-2">저장된 트렌드가 없습니다</h3>
+      <p class="text-sm text-gray-500 mb-6">유행어 사전이나 밈주식에서 관심 있는 항목을 저장해보세요.</p>
+      <a href="dictionary.html" class="inline-block px-6 py-3 bg-dark text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition-colors">유행어 사전 보러가기</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+function filterTab(btn, type) {
+  document.querySelectorAll('.filter-tab').forEach(b => {
+    b.className = 'filter-tab flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-gray-400';
+  });
+  btn.className = 'filter-tab flex-shrink-0 px-5 py-2 bg-dark text-white rounded-full text-sm font-bold';
+  document.querySelectorAll('#trendGrid > a').forEach(card => {
+    card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
+  });
+}
+
+function removeSaved(e, btn) {
+  e.preventDefault(); e.stopPropagation();
+  const card = btn.closest('a');
+  card.style.opacity = '0'; card.style.transform = 'scale(0.9)'; card.style.transition = 'all .3s';
+  setTimeout(() => { card.remove(); checkEmpty(); }, 300);
+}
+
+function checkEmpty() {
+  const visible = document.querySelectorAll('#trendGrid > a');
+  document.getElementById('emptyState').classList.toggle('hidden', visible.length > 0);
+}
+
+function logout() { localStorage.removeItem('isLoggedIn'); window.location.href='index.html'; }
+</script>
+</body>
+</html>

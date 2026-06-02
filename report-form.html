@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>밈 제보 등록 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family:"Pretendard",sans-serif; }
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    input:focus, textarea:focus, select:focus { outline:none; border-color:#00FF00; box-shadow:0 0 0 3px rgba(0,255,0,.1); }
+    .upload-zone { transition:all .3s; border:2px dashed #e5e7eb; }
+    .upload-zone:hover, .upload-zone.drag { border-color:#00FF00; background:rgba(0,255,0,.03); }
+    .hero-gradient { background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%); }
+    .step-dot { transition:all .3s; }
+    .step-dot.active { background:#111; color:#00FF00; }
+    .step-dot.done { background:#00FF00; color:#111; }
+    .tag-input-wrap input { outline:none; border:none; }
+    .success-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:100; align-items:center; justify-content:center; }
+    .success-overlay.show { display:flex; }
+    @keyframes pop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .pop { animation:pop .4s cubic-bezier(.175,.885,.32,1.275) forwards; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand" href="vote.html">트렌드 투표</a>
+        <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3">
+        <div id="authLoggedOut" class="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="login.html" class="hover:text-dark">로그인</a><a href="signup.html" class="hover:text-dark">회원가입</a>
+        </div>
+        <div id="authLoggedIn" class="hidden flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+          <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-dark/60 mb-3 flex items-center gap-2">
+      <a href="upload.html" class="hover:text-dark">업로드</a><span>›</span><span class="text-dark font-bold">밈 제보 등록</span>
+    </nav>
+    <h1 class="text-4xl font-black text-dark mb-2">밈 제보하기</h1>
+    <p class="text-dark/60 text-sm">발견한 트렌드와 밈을 Trendify에 공유해보세요 🔥</p>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+
+    <!-- 진행 단계 -->
+    <div class="flex items-center gap-3 mb-10">
+      <div class="flex items-center gap-2">
+        <div id="step1" class="step-dot active w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">1</div>
+        <span class="text-sm font-bold text-dark">기본 정보</span>
+      </div>
+      <div class="flex-1 h-0.5 bg-gray-200" id="line1"></div>
+      <div class="flex items-center gap-2">
+        <div id="step2" class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-sm font-black">2</div>
+        <span class="text-sm text-gray-400" id="step2Label">상세 정보</span>
+      </div>
+      <div class="flex-1 h-0.5 bg-gray-200" id="line2"></div>
+      <div class="flex items-center gap-2">
+        <div id="step3" class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-sm font-black">3</div>
+        <span class="text-sm text-gray-400" id="step3Label">검토 및 제출</span>
+      </div>
+    </div>
+
+    <!-- Step 1: 기본 정보 -->
+    <div id="formStep1" class="space-y-6">
+      <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+        <h2 class="text-lg font-black text-dark mb-6">기본 정보</h2>
+
+        <!-- 밈 유형 -->
+        <div class="mb-6">
+          <label class="block text-sm font-bold text-dark mb-3">밈 유형 선택</label>
+          <div class="grid grid-cols-3 gap-3">
+            <label class="cursor-pointer">
+              <input type="radio" name="mimeType" value="word" class="hidden peer" checked/>
+              <div class="peer-checked:border-dark peer-checked:bg-dark peer-checked:text-brand border-2 border-gray-200 rounded-xl p-4 text-center transition-all text-gray-600 hover:border-gray-300">
+                <div class="text-2xl mb-1">💬</div>
+                <p class="text-xs font-bold">유행어</p>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="mimeType" value="image" class="hidden peer"/>
+              <div class="peer-checked:border-dark peer-checked:bg-dark peer-checked:text-brand border-2 border-gray-200 rounded-xl p-4 text-center transition-all text-gray-600 hover:border-gray-300">
+                <div class="text-2xl mb-1">🖼️</div>
+                <p class="text-xs font-bold">이미지 밈</p>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="mimeType" value="video" class="hidden peer"/>
+              <div class="peer-checked:border-dark peer-checked:bg-dark peer-checked:text-brand border-2 border-gray-200 rounded-xl p-4 text-center transition-all text-gray-600 hover:border-gray-300">
+                <div class="text-2xl mb-1">🎬</div>
+                <p class="text-xs font-bold">영상 밈</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 제목 -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-dark mb-2">밈/유행어 이름 <span class="text-red-500">*</span></label>
+          <input id="mimeTitle" type="text" placeholder="예: 중꺾마, 갓생, 킹받다..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all"/>
+          <p id="titleErr" class="hidden mt-1 text-xs text-red-500">제목을 입력해주세요.</p>
+        </div>
+
+        <!-- 분류 -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-dark mb-2">분류 <span class="text-red-500">*</span></label>
+          <select id="category" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm bg-white transition-all">
+            <option value="">분류를 선택하세요</option>
+            <option value="mz">MZ어</option>
+            <option value="abbr">줄임말</option>
+            <option value="image">이미지 밈</option>
+            <option value="video">영상 밈</option>
+            <option value="challenge">챌린지</option>
+            <option value="etc">기타</option>
+          </select>
+          <p id="catErr" class="hidden mt-1 text-xs text-red-500">분류를 선택해주세요.</p>
+        </div>
+
+        <!-- 간단 설명 -->
+        <div>
+          <label class="block text-sm font-bold text-dark mb-2">한 줄 설명 <span class="text-red-500">*</span></label>
+          <input id="mimeShort" type="text" placeholder="밈을 한 문장으로 설명해주세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all"/>
+          <p id="shortErr" class="hidden mt-1 text-xs text-red-500">한 줄 설명을 입력해주세요.</p>
+        </div>
+      </div>
+      <button onclick="nextStep(1)" class="w-full py-4 bg-dark text-white font-black rounded-xl hover:bg-gray-800 transition-all">다음 단계 →</button>
+    </div>
+
+    <!-- Step 2: 상세 정보 -->
+    <div id="formStep2" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+        <h2 class="text-lg font-black text-dark mb-6">상세 정보</h2>
+
+        <!-- 상세 설명 -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-dark mb-2">상세 설명</label>
+          <textarea id="mimeDetail" rows="4" placeholder="유래, 사용 맥락, 관련 이야기 등을 자세히 작성해주세요"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm resize-none transition-all"></textarea>
+        </div>
+
+        <!-- 예문 -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-dark mb-2">예문</label>
+          <input id="mimeExample" type="text" placeholder='예: "야 진짜 킹받아, 왜 나한테만 이래?"'
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all"/>
+        </div>
+
+        <!-- 이미지 업로드 -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-dark mb-2">관련 이미지 (선택)</label>
+          <div id="uploadZone" class="upload-zone rounded-2xl p-10 text-center cursor-pointer"
+            onclick="document.getElementById('fileInput').click()"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')">
+            <div class="text-4xl mb-3">📎</div>
+            <p class="text-sm font-medium text-gray-500">클릭하거나 파일을 여기로 드래그하세요</p>
+            <p class="text-xs text-gray-400 mt-1">JPG, PNG, GIF 최대 10MB</p>
+          </div>
+          <input id="fileInput" type="file" accept="image/*,video/*" class="hidden" onchange="showPreview(this)"/>
+          <div id="previewWrap" class="hidden mt-3">
+            <img id="previewImg" class="w-full h-48 object-cover rounded-xl"/>
+            <button onclick="clearFile()" class="mt-2 text-xs text-red-500 hover:underline">파일 제거</button>
+          </div>
+        </div>
+
+        <!-- 태그 -->
+        <div>
+          <label class="block text-sm font-bold text-dark mb-2">태그</label>
+          <div class="tag-input-wrap border border-gray-300 rounded-xl px-4 py-3 flex flex-wrap gap-2 min-h-12" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+            <input id="tagInput" type="text" placeholder="#태그 추가 (Enter)"
+              class="text-sm flex-1 min-w-20"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"/>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">Enter 키로 태그를 추가하세요 (최대 5개)</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="prevStep(2)" class="flex-1 py-4 bg-gray-100 text-dark font-black rounded-xl hover:bg-gray-200 transition-all">← 이전</button>
+        <button onclick="nextStep(2)" class="flex-2 flex-grow py-4 bg-dark text-white font-black rounded-xl hover:bg-gray-800 transition-all">다음 단계 →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: 검토 및 제출 -->
+    <div id="formStep3" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+        <h2 class="text-lg font-black text-dark mb-6">제출 전 확인</h2>
+        <div id="reviewContent" class="space-y-4 text-sm">
+          <!-- JS로 채움 -->
+        </div>
+      </div>
+      <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 text-xs text-yellow-700 leading-relaxed">
+        📋 제보된 밈은 Trendify 운영팀의 검토 후 등록됩니다. 검수 기간은 최대 3영업일이 소요됩니다.
+      </div>
+      <div class="flex gap-3">
+        <button onclick="prevStep(3)" class="flex-1 py-4 bg-gray-100 text-dark font-black rounded-xl hover:bg-gray-200 transition-all">← 수정</button>
+        <button onclick="submitReport()" class="flex-2 flex-grow py-4 bg-brand text-dark font-black rounded-xl hover:brightness-90 transition-all">🚀 제보 제출</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- 제출 완료 모달 -->
+<div id="successOverlay" class="success-overlay">
+  <div class="pop bg-white rounded-3xl p-10 mx-4 max-w-sm w-full text-center shadow-2xl">
+    <div class="w-16 h-16 bg-brand rounded-full flex items-center justify-center mx-auto mb-5">
+      <svg class="w-8 h-8 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 class="text-xl font-black text-dark mb-2">제보 완료! 🎉</h3>
+    <p class="text-sm text-gray-500 mb-2">밈 제보가 성공적으로 접수되었습니다.</p>
+    <p class="text-xs text-gray-400 mb-8">운영팀 검토 후 최대 3영업일 내 등록됩니다.</p>
+    <div class="flex gap-3">
+      <button onclick="window.location.href='my-reports.html'" class="flex-1 py-3 bg-dark text-white font-bold rounded-xl text-sm hover:bg-gray-800">제보 내역 보기</button>
+      <button onclick="window.location.href='upload.html'" class="flex-1 py-3 bg-gray-100 text-dark font-bold rounded-xl text-sm hover:bg-gray-200">더 제보하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+let tags = [];
+
+function nextStep(from) {
+  if (from === 1) {
+    const t = document.getElementById('mimeTitle').value.trim();
+    const c = document.getElementById('category').value;
+    const s = document.getElementById('mimeShort').value.trim();
+    let ok = true;
+    if (!t) { document.getElementById('titleErr').classList.remove('hidden'); document.getElementById('mimeTitle').classList.add('border-red-400'); ok=false; }
+    else { document.getElementById('titleErr').classList.add('hidden'); document.getElementById('mimeTitle').classList.remove('border-red-400'); }
+    if (!c) { document.getElementById('catErr').classList.remove('hidden'); ok=false; }
+    else { document.getElementById('catErr').classList.add('hidden'); }
+    if (!s) { document.getElementById('shortErr').classList.remove('hidden'); document.getElementById('mimeShort').classList.add('border-red-400'); ok=false; }
+    else { document.getElementById('shortErr').classList.add('hidden'); document.getElementById('mimeShort').classList.remove('border-red-400'); }
+    if (!ok) return;
+  }
+  showStep(from + 1);
+}
+function prevStep(from) { showStep(from - 1); }
+
+function showStep(step) {
+  currentStep = step;
+  [1,2,3].forEach(i => {
+    document.getElementById('formStep'+i).classList.toggle('hidden', i !== step);
+    const dot = document.getElementById('step'+i);
+    dot.className = 'step-dot w-8 h-8 rounded-full flex items-center justify-center text-sm font-black ';
+    if (i < step) dot.className += 'done bg-brand text-dark';
+    else if (i === step) dot.className += 'active bg-dark text-brand';
+    else dot.className += 'bg-gray-200 text-gray-400';
+  });
+  if (step === 3) buildReview();
+}
+
+function buildReview() {
+  const catMap = {mz:'MZ어',abbr:'줄임말',image:'이미지 밈',video:'영상 밈',challenge:'챌린지',etc:'기타'};
+  const rows = [
+    ['제목', document.getElementById('mimeTitle').value],
+    ['분류', catMap[document.getElementById('category').value] || '-'],
+    ['한 줄 설명', document.getElementById('mimeShort').value],
+    ['상세 설명', document.getElementById('mimeDetail').value || '-'],
+    ['예문', document.getElementById('mimeExample').value || '-'],
+    ['태그', tags.length ? tags.join(', ') : '-'],
+  ];
+  document.getElementById('reviewContent').innerHTML = rows.map(([k,v]) => `
+    <div class="flex gap-4 py-3 border-b border-gray-50 last:border-0">
+      <span class="text-gray-400 w-24 flex-shrink-0">${k}</span>
+      <span class="font-medium text-dark">${v}</span>
+    </div>`).join('');
+}
+
+function addTag() {
+  const input = document.getElementById('tagInput');
+  let val = input.value.trim().replace(/^#/, '');
+  if (!val || tags.length >= 5) { input.value=''; return; }
+  if (!tags.includes(val)) {
+    tags.push(val);
+    const chip = document.createElement('div');
+    chip.className = 'flex items-center gap-1 bg-dark text-white px-3 py-1 rounded-full text-xs font-bold';
+    chip.innerHTML = `#${val} <button type="button" onclick="removeTag('${val}',this.parentElement)" class="ml-1 text-brand font-black">×</button>`;
+    document.getElementById('tagWrap').insertBefore(chip, input);
+  }
+  input.value='';
+}
+
+function removeTag(val, el) {
+  tags = tags.filter(t => t !== val);
+  el.remove();
+}
+
+function showPreview(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('previewWrap').classList.remove('hidden');
+    document.getElementById('uploadZone').classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearFile() {
+  document.getElementById('fileInput').value='';
+  document.getElementById('previewWrap').classList.add('hidden');
+  document.getElementById('uploadZone').classList.remove('hidden');
+}
+
+function submitReport() {
+  document.getElementById('successOverlay').classList.add('show');
+}
+
+function updateAuthUI() {
+  const ok = localStorage.getItem('isLoggedIn')==='true';
+  document.getElementById('authLoggedOut').classList.toggle('hidden',ok);
+  document.getElementById('authLoggedIn').classList.toggle('hidden',!ok);
+}
+function logout() { localStorage.removeItem('isLoggedIn'); updateAuthUI(); }
+updateAuthUI();
+</script>
+</body>
+</html>

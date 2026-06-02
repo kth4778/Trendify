@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>투표 상세 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family:"Pretendard",sans-serif; }
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .vote-card { transition:all .3s; border:2px solid transparent; cursor:pointer; }
+    .vote-card:hover { border-color:#00FF00; transform:translateY(-4px); box-shadow:0 20px 40px -10px rgba(0,255,0,.15); }
+    .vote-card.voted-a { border-color:#00FF00; background:rgba(0,255,0,.05); }
+    .vote-card.voted-b { border-color:#6366F1; background:rgba(99,102,241,.05); }
+    .vote-bar { transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+    .hero-gradient { background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%); }
+    .comment-input:focus { outline:none; border-color:#00FF00; box-shadow:0 0 0 3px rgba(0,255,0,.1); }
+    @keyframes confetti { 0%{transform:scale(0) rotate(0deg);opacity:1} 100%{transform:scale(1.5) rotate(360deg);opacity:0} }
+    .confetti-pop { animation:confetti .6s ease forwards; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3">
+        <div id="authLoggedOut" class="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="login.html" class="hover:text-dark">로그인</a><a href="signup.html" class="hover:text-dark">회원가입</a>
+        </div>
+        <div id="authLoggedIn" class="hidden flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+          <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-dark/60 mb-3 flex items-center gap-2">
+      <a href="vote.html" class="hover:text-dark">트렌드 투표</a><span>›</span><span class="text-dark font-bold">투표 상세</span>
+    </nav>
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1 bg-dark text-brand text-xs font-black rounded-full" id="voteStatus">LIVE</span>
+      <h1 class="text-3xl font-black text-dark" id="voteTitle">중꺾마 vs 갓생</h1>
+    </div>
+    <p class="text-dark/60 text-sm mt-2" id="voteDesc">2024년 MZ세대 대표 단어, 당신의 선택은?</p>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto space-y-8">
+
+    <!-- 투표 카드 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="voteCards">
+      <!-- A -->
+      <div id="cardA" class="vote-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center" onclick="vote('A')">
+        <div class="text-6xl mb-4" id="emojiA">🔥</div>
+        <h2 class="text-3xl font-black text-dark mb-2" id="optionA">중꺾마</h2>
+        <p class="text-sm text-gray-500 mb-6" id="descA">중요한 건 꺾이지 않는 마음</p>
+        <div class="mt-4">
+          <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div id="barA" class="vote-bar h-full bg-brand rounded-full" style="width:0%"></div>
+          </div>
+          <p class="text-sm font-bold text-dark mt-2" id="pctA">0%</p>
+          <p class="text-xs text-gray-400" id="cntA">0표</p>
+        </div>
+      </div>
+      <!-- B -->
+      <div id="cardB" class="vote-card bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center" onclick="vote('B')">
+        <div class="text-6xl mb-4" id="emojiB">✨</div>
+        <h2 class="text-3xl font-black text-dark mb-2" id="optionB">갓생</h2>
+        <p class="text-sm text-gray-500 mb-6" id="descB">신처럼 부지런하고 완벽한 삶</p>
+        <div class="mt-4">
+          <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div id="barB" class="vote-bar h-full bg-indigo-400 rounded-full" style="width:0%"></div>
+          </div>
+          <p class="text-sm font-bold text-dark mt-2" id="pctB">0%</p>
+          <p class="text-xs text-gray-400" id="cntB">0표</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 안내 텍스트 -->
+    <p class="text-center text-sm text-gray-400" id="voteHint">카드를 클릭해 투표하세요!</p>
+
+    <!-- 결과 바 (투표 후 노출) -->
+    <div id="resultBar" class="hidden bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+      <h3 class="text-sm font-bold text-dark mb-4">실시간 현황</h3>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold text-dark w-16 text-right" id="nameA">중꺾마</span>
+        <div class="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden flex">
+          <div id="bigBarA" class="vote-bar h-full bg-brand transition-all duration-1000" style="width:0%"></div>
+          <div id="bigBarB" class="vote-bar h-full bg-indigo-400 transition-all duration-1000" style="width:0%"></div>
+        </div>
+        <span class="text-xs font-bold text-dark w-16" id="nameB">갓생</span>
+      </div>
+      <div class="flex justify-between text-xs text-gray-400 mt-2 px-20">
+        <span id="bigPctA">0%</span><span id="totalVotes">총 0표</span><span id="bigPctB">0%</span>
+      </div>
+    </div>
+
+    <!-- 투표 정보 -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-xs text-gray-400 mb-1">총 투표수</p>
+        <p class="text-xl font-black text-dark" id="totalEl">12,847</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-xs text-gray-400 mb-1">투표 기간</p>
+        <p class="text-sm font-bold text-dark">~ 06.09</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-xs text-gray-400 mb-1">남은 시간</p>
+        <p class="text-sm font-black text-brand" id="countdown">6일 14시간</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-xs text-gray-400 mb-1">카테고리</p>
+        <p class="text-sm font-bold text-dark">MZ어</p>
+      </div>
+    </div>
+
+    <!-- 댓글 -->
+    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+      <h3 class="text-base font-bold text-dark mb-5">댓글 <span class="text-brand" id="commentCount">3</span></h3>
+      <!-- 댓글 입력 -->
+      <div class="flex gap-3 mb-6">
+        <div class="w-9 h-9 rounded-full bg-brand flex items-center justify-center text-dark font-black text-sm flex-shrink-0">나</div>
+        <div class="flex-1">
+          <input id="commentInput" type="text" placeholder="의견을 남겨보세요..."
+            class="comment-input w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm transition-all"
+            onkeydown="if(event.key==='Enter') addComment()"/>
+        </div>
+        <button onclick="addComment()" class="px-4 py-2 bg-dark text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition-colors">등록</button>
+      </div>
+      <!-- 댓글 목록 -->
+      <div id="commentList" class="space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm flex-shrink-0">J</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-bold text-dark">jungkwang_kim</span>
+              <span class="text-xs text-gray-400">2분 전</span>
+            </div>
+            <p class="text-sm text-gray-700">중꺾마지!! 갓생은 좀 억지스럽고 중꺾마가 더 자연스럽게 쓰임</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">M</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-bold text-dark">minseo_y</span>
+              <span class="text-xs text-gray-400">8분 전</span>
+            </div>
+            <p class="text-sm text-gray-700">갓생 ㅋㅋ 요즘 인스타에서 갓생 챌린지가 더 핫한 것 같음</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold text-sm flex-shrink-0">P</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-sm font-bold text-dark">park_trend</span>
+              <span class="text-xs text-gray-400">15분 전</span>
+            </div>
+            <p class="text-sm text-gray-700">둘 다 레전드 유행어인데 중꺾마가 더 감동적이라 압승할 듯</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const VOTES = {
+  '1': { title:'중꺾마 vs 갓생', desc:'2024년 MZ세대 대표 단어, 당신의 선택은?', emojiA:'🔥', optA:'중꺾마', descA:'중요한 건 꺾이지 않는 마음', emojiB:'✨', optB:'갓생', descB:'신처럼 부지런하고 완벽한 삶', cntA:7820, cntB:5027, status:'LIVE' },
+  '2': { title:'킹받다 vs 현타', desc:'더 자주 쓰는 감정 표현은?', emojiA:'👑', optA:'킹받다', descA:'매우 열 받고 화가 나다', emojiB:'😮‍💨', optB:'현타', descB:'현실을 갑자기 자각하는 순간', cntA:4312, cntB:6198, status:'LIVE' },
+  '3': { title:'오운완 vs 알잘딱깔센', desc:'더 어려운 유행어는?', emojiA:'💪', optA:'오운완', descA:'오늘 운동 완료의 줄임말', emojiB:'🧠', optB:'알잘딱깔센', descB:'알아서 잘 딱 깔끔하고 센스있게', cntA:3210, cntB:2988, status:'LIVE' },
+};
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id') || '1';
+const d = VOTES[id] || VOTES['1'];
+
+let cntA = d.cntA, cntB = d.cntB;
+let myVote = null;
+
+document.getElementById('voteTitle').textContent = d.title;
+document.getElementById('voteDesc').textContent = d.desc;
+document.getElementById('voteStatus').textContent = d.status;
+document.getElementById('emojiA').textContent = d.emojiA;
+document.getElementById('optionA').textContent = d.optA;
+document.getElementById('descA').textContent = d.descA;
+document.getElementById('emojiB').textContent = d.emojiB;
+document.getElementById('optionB').textContent = d.optB;
+document.getElementById('descB').textContent = d.descB;
+document.getElementById('nameA').textContent = d.optA;
+document.getElementById('nameB').textContent = d.optB;
+document.getElementById('totalEl').textContent = (cntA + cntB).toLocaleString();
+document.title = d.title + ' - Trendify';
+
+function updateBars() {
+  const total = cntA + cntB;
+  const pA = Math.round(cntA / total * 100);
+  const pB = 100 - pA;
+  document.getElementById('barA').style.width = pA + '%';
+  document.getElementById('barB').style.width = pB + '%';
+  document.getElementById('pctA').textContent = pA + '%';
+  document.getElementById('pctB').textContent = pB + '%';
+  document.getElementById('cntA').textContent = cntA.toLocaleString() + '표';
+  document.getElementById('cntB').textContent = cntB.toLocaleString() + '표';
+  document.getElementById('bigBarA').style.width = pA + '%';
+  document.getElementById('bigBarB').style.width = pB + '%';
+  document.getElementById('bigPctA').textContent = pA + '%';
+  document.getElementById('bigPctB').textContent = pB + '%';
+  document.getElementById('totalVotes').textContent = '총 ' + total.toLocaleString() + '표';
+  document.getElementById('totalEl').textContent = total.toLocaleString();
+}
+
+function vote(side) {
+  if (myVote) return;
+  myVote = side;
+  if (side === 'A') { cntA++; document.getElementById('cardA').classList.add('voted-a'); }
+  else { cntB++; document.getElementById('cardB').classList.add('voted-b'); }
+  document.getElementById('voteHint').textContent = side === 'A' ? `✅ ${d.optA}에 투표했습니다!` : `✅ ${d.optB}에 투표했습니다!`;
+  document.getElementById('resultBar').classList.remove('hidden');
+  updateBars();
+}
+
+// 초기 바 표시 (애니메이션)
+setTimeout(updateBars, 300);
+
+// 댓글
+let commentCount = 3;
+function addComment() {
+  const input = document.getElementById('commentInput');
+  const text = input.value.trim();
+  if (!text) return;
+  commentCount++;
+  document.getElementById('commentCount').textContent = commentCount;
+  const el = document.createElement('div');
+  el.className = 'flex items-start gap-3';
+  el.innerHTML = `
+    <div class="w-9 h-9 rounded-full bg-brand flex items-center justify-center text-dark font-black text-sm flex-shrink-0">나</div>
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-sm font-bold text-dark">나</span>
+        <span class="text-xs text-gray-400">방금</span>
+      </div>
+      <p class="text-sm text-gray-700">${text}</p>
+    </div>`;
+  document.getElementById('commentList').prepend(el);
+  input.value = '';
+}
+
+function updateAuthUI() {
+  const ok = localStorage.getItem('isLoggedIn')==='true';
+  document.getElementById('authLoggedOut').classList.toggle('hidden',ok);
+  document.getElementById('authLoggedIn').classList.toggle('hidden',!ok);
+}
+function logout() { localStorage.removeItem('isLoggedIn'); updateAuthUI(); }
+updateAuthUI();
+</script>
+</body>
+</html>

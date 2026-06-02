@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>가상 포트폴리오 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body{font-family:"Pretendard",sans-serif;}
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .hero-gradient{background:linear-gradient(135deg,#111 0%,#222 100%)}
+    .stock-row{transition:all .2s}.stock-row:hover{background:#f9fafb}
+    .donut-ring{transform:rotate(-90deg);transform-origin:50% 50%}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3 text-xs font-medium text-gray-500">
+        <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+        <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient text-white py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-white/40 mb-3 flex items-center gap-2">
+      <a href="mypage.html" class="hover:text-white">마이페이지</a><span>›</span><span class="text-white font-bold">가상 포트폴리오</span>
+    </nav>
+    <h1 class="text-4xl font-black mb-4">가상 포트폴리오</h1>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div>
+        <p class="text-white/50 text-xs mb-1">총 평가금액</p>
+        <p class="text-3xl font-black">₩ 1,284,750</p>
+      </div>
+      <div>
+        <p class="text-white/50 text-xs mb-1">투자 원금</p>
+        <p class="text-2xl font-black">₩ 1,000,000</p>
+      </div>
+      <div>
+        <p class="text-white/50 text-xs mb-1">총 손익</p>
+        <p class="text-2xl font-black text-brand">+₩ 284,750</p>
+      </div>
+      <div>
+        <p class="text-white/50 text-xs mb-1">수익률</p>
+        <p class="text-2xl font-black text-brand">+28.47%</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- 종목 목록 -->
+      <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-dark">보유 종목</h2>
+          <a href="meme-stock.html" class="text-xs font-bold text-brand hover:underline">+ 종목 추가</a>
+        </div>
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <!-- 헤더 -->
+          <div class="flex items-center px-6 py-3 bg-gray-50 text-xs font-bold text-gray-400 border-b border-gray-100">
+            <span class="flex-1">종목명</span>
+            <span class="w-20 text-right">보유수량</span>
+            <span class="w-24 text-right">평균단가</span>
+            <span class="w-24 text-right">현재가</span>
+            <span class="w-24 text-right">손익</span>
+            <span class="w-16 text-right">거래</span>
+          </div>
+
+          <div class="divide-y divide-gray-50">
+            <div class="stock-row flex items-center px-6 py-4">
+              <div class="flex-1">
+                <p class="text-sm font-black text-dark">중꺾마</p>
+                <p class="text-xs text-gray-400">JKM</p>
+              </div>
+              <span class="w-20 text-right text-sm font-medium">30주</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 11,200</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 12,480</span>
+              <span class="w-24 text-right text-sm font-black text-green-500">+₩ 38,400<br/><span class="text-xs font-medium">+11.4%</span></span>
+              <div class="w-16 text-right">
+                <a href="stock-trade.html?stock=중꺾마&type=sell" class="text-xs font-bold text-brand hover:underline">매도</a>
+              </div>
+            </div>
+
+            <div class="stock-row flex items-center px-6 py-4">
+              <div class="flex-1">
+                <p class="text-sm font-black text-dark">갓생</p>
+                <p class="text-xs text-gray-400">GDS</p>
+              </div>
+              <span class="w-20 text-right text-sm font-medium">50주</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 8,900</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 9,750</span>
+              <span class="w-24 text-right text-sm font-black text-green-500">+₩ 42,500<br/><span class="text-xs font-medium">+9.5%</span></span>
+              <div class="w-16 text-right">
+                <a href="stock-trade.html?stock=갓생&type=sell" class="text-xs font-bold text-brand hover:underline">매도</a>
+              </div>
+            </div>
+
+            <div class="stock-row flex items-center px-6 py-4">
+              <div class="flex-1">
+                <p class="text-sm font-black text-dark">킹받다</p>
+                <p class="text-xs text-gray-400">KNG</p>
+              </div>
+              <span class="w-20 text-right text-sm font-medium">20주</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 7,800</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 7,320</span>
+              <span class="w-24 text-right text-sm font-black text-red-500">-₩ 9,600<br/><span class="text-xs font-medium">-6.1%</span></span>
+              <div class="w-16 text-right">
+                <a href="stock-trade.html?stock=킹받다&type=sell" class="text-xs font-bold text-brand hover:underline">매도</a>
+              </div>
+            </div>
+
+            <div class="stock-row flex items-center px-6 py-4">
+              <div class="flex-1">
+                <p class="text-sm font-black text-dark">오운완</p>
+                <p class="text-xs text-gray-400">OWW</p>
+              </div>
+              <span class="w-20 text-right text-sm font-medium">40주</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 5,800</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 6,120</span>
+              <span class="w-24 text-right text-sm font-black text-green-500">+₩ 12,800<br/><span class="text-xs font-medium">+5.5%</span></span>
+              <div class="w-16 text-right">
+                <a href="stock-trade.html?stock=오운완&type=sell" class="text-xs font-bold text-brand hover:underline">매도</a>
+              </div>
+            </div>
+
+            <div class="stock-row flex items-center px-6 py-4">
+              <div class="flex-1">
+                <p class="text-sm font-black text-dark">현타</p>
+                <p class="text-xs text-gray-400">HNT</p>
+              </div>
+              <span class="w-20 text-right text-sm font-medium">25주</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 5,200</span>
+              <span class="w-24 text-right text-sm font-medium">₩ 5,890</span>
+              <span class="w-24 text-right text-sm font-black text-green-500">+₩ 17,250<br/><span class="text-xs font-medium">+13.3%</span></span>
+              <div class="w-16 text-right">
+                <a href="stock-trade.html?stock=현타&type=sell" class="text-xs font-bold text-brand hover:underline">매도</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 거래 내역 -->
+        <div class="mt-8">
+          <h2 class="text-base font-bold text-dark mb-4">최근 거래 내역</h2>
+          <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="divide-y divide-gray-50 text-sm">
+              <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 bg-brand text-dark rounded-lg flex items-center justify-center text-xs font-black">구</span>
+                  <div><p class="font-bold text-dark">중꺾마 30주 구매</p><p class="text-xs text-gray-400">2024.05.28 14:32</p></div>
+                </div>
+                <span class="font-black text-dark">-₩ 336,000</span>
+              </div>
+              <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 bg-brand text-dark rounded-lg flex items-center justify-center text-xs font-black">구</span>
+                  <div><p class="font-bold text-dark">갓생 50주 구매</p><p class="text-xs text-gray-400">2024.05.25 10:11</p></div>
+                </div>
+                <span class="font-black text-dark">-₩ 445,000</span>
+              </div>
+              <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 bg-red-100 text-red-500 rounded-lg flex items-center justify-center text-xs font-black">매</span>
+                  <div><p class="font-bold text-dark">알잘딱깔센 10주 판매</p><p class="text-xs text-gray-400">2024.05.20 09:00</p></div>
+                </div>
+                <span class="font-black text-green-500">+₩ 42,500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 사이드 -->
+      <div class="space-y-6">
+        <!-- 포트폴리오 구성 -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <h3 class="text-sm font-bold text-dark mb-5">포트폴리오 구성</h3>
+          <svg viewBox="0 0 100 100" class="w-full max-w-40 mx-auto mb-4">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#f3f4f6" stroke-width="12"/>
+            <circle class="donut-ring" cx="50" cy="50" r="40" fill="none" stroke="#00FF00" stroke-width="12" stroke-dasharray="96 155" stroke-dashoffset="0"/>
+            <circle class="donut-ring" cx="50" cy="50" r="40" fill="none" stroke="#6366F1" stroke-width="12" stroke-dasharray="67 155" stroke-dashoffset="-96"/>
+            <circle class="donut-ring" cx="50" cy="50" r="40" fill="none" stroke="#EF4444" stroke-width="12" stroke-dasharray="30 155" stroke-dashoffset="-163"/>
+            <circle class="donut-ring" cx="50" cy="50" r="40" fill="none" stroke="#F59E0B" stroke-width="12" stroke-dasharray="20 155" stroke-dashoffset="-193"/>
+            <circle class="donut-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="12" stroke-dasharray="42 155" stroke-dashoffset="-213"/>
+          </svg>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-brand inline-block"></span><span class="text-gray-600">중꺾마</span></div><span class="font-bold">29%</span></div>
+            <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-indigo-400 inline-block"></span><span class="text-gray-600">갓생</span></div><span class="font-bold">38%</span></div>
+            <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-red-400 inline-block"></span><span class="text-gray-600">킹받다</span></div><span class="font-bold">11%</span></div>
+            <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-amber-400 inline-block"></span><span class="text-gray-600">오운완</span></div><span class="font-bold">19%</span></div>
+            <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-blue-400 inline-block"></span><span class="text-gray-600">현타</span></div><span class="font-bold">11%</span></div>
+          </div>
+        </div>
+
+        <!-- 캐시 잔고 -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <h3 class="text-sm font-bold text-dark mb-4">캐시 잔고</h3>
+          <p class="text-3xl font-black text-dark mb-1">₩ 183,600</p>
+          <p class="text-xs text-gray-400">즉시 사용 가능</p>
+          <a href="meme-stock.html" class="mt-4 block w-full py-3 bg-dark text-white font-bold rounded-xl text-sm text-center hover:bg-gray-800 transition-all">종목 더 구매하기</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+function logout() { localStorage.removeItem('isLoggedIn'); window.location.href='index.html'; }
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>종목 거래 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family:"Pretendard",sans-serif; }
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    input:focus { outline:none; border-color:#00FF00; box-shadow:0 0 0 3px rgba(0,255,0,.1); }
+    .type-btn { transition:all .2s; }
+    .type-btn.buy-active { background:#00FF00; color:#111; }
+    .type-btn.sell-active { background:#EF4444; color:#fff; }
+    .success-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:100; align-items:center; justify-content:center; }
+    .success-overlay.show { display:flex; }
+    @keyframes pop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .pop { animation:pop .4s cubic-bezier(.175,.885,.32,1.275) forwards; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+        <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand transition-colors" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3">
+        <div id="authLoggedOut" class="flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="login.html" class="hover:text-dark">로그인</a><a href="signup.html" class="hover:text-dark">회원가입</a>
+        </div>
+        <div id="authLoggedIn" class="hidden flex items-center space-x-3 text-xs font-medium text-gray-500">
+          <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+          <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+
+    <!-- 브레드크럼 -->
+    <nav class="text-xs text-gray-400 mb-6 flex items-center gap-2">
+      <a href="meme-stock.html" class="hover:text-dark">밈주식</a>
+      <span>›</span><a href="#" id="detailLink" class="hover:text-dark">종목 상세</a>
+      <span>›</span><span class="text-dark font-bold">거래</span>
+    </nav>
+
+    <!-- 종목 요약 -->
+    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-dark rounded-2xl flex items-center justify-center">
+            <span class="text-brand font-black text-xs" id="tickerBadge">JKM</span>
+          </div>
+          <div>
+            <h2 class="font-black text-dark text-lg" id="stockNameEl">중꺾마</h2>
+            <p class="text-xs text-gray-400">밈주식 가상 자산</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-black text-dark" id="currentPrice">₩ 12,480</p>
+          <p class="text-xs font-bold text-green-500" id="priceChange">▲ +11.0%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 거래 패널 -->
+    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+      <h2 class="text-xl font-black text-dark mb-6">가상 거래</h2>
+
+      <!-- 구매/판매 토글 -->
+      <div class="flex gap-2 mb-8 bg-gray-100 p-1 rounded-xl">
+        <button id="tabBuy" class="type-btn flex-1 py-2.5 rounded-lg text-sm font-bold transition-all buy-active" onclick="setType('buy')">구매</button>
+        <button id="tabSell" class="type-btn flex-1 py-2.5 rounded-lg text-sm font-bold text-gray-500 transition-all" onclick="setType('sell')">판매</button>
+      </div>
+
+      <form onsubmit="handleTrade(event)" novalidate>
+        <!-- 보유 캐시 / 보유 주식 -->
+        <div class="flex justify-between text-sm mb-6 px-1">
+          <div>
+            <p class="text-gray-400 text-xs mb-0.5">보유 캐시</p>
+            <p class="font-bold text-dark">₩ 1,000,000</p>
+          </div>
+          <div class="text-right">
+            <p class="text-gray-400 text-xs mb-0.5">보유 주식</p>
+            <p class="font-bold text-dark">50주</p>
+          </div>
+        </div>
+
+        <!-- 수량 입력 -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold text-dark mb-2">수량</label>
+          <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden">
+            <button type="button" onclick="addQty(-1)" class="px-4 py-3 bg-gray-50 hover:bg-gray-100 text-dark font-bold text-lg transition-colors">−</button>
+            <input type="number" id="qty" value="1" min="1" max="9999"
+              class="flex-1 text-center py-3 text-lg font-black text-dark border-none focus:ring-0 focus:outline-none"
+              oninput="calcTotal()"/>
+            <button type="button" onclick="addQty(1)" class="px-4 py-3 bg-gray-50 hover:bg-gray-100 text-dark font-bold text-lg transition-colors">+</button>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button type="button" onclick="setQtyPct(0.25)" class="flex-1 py-1.5 bg-gray-100 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-200">25%</button>
+            <button type="button" onclick="setQtyPct(0.5)" class="flex-1 py-1.5 bg-gray-100 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-200">50%</button>
+            <button type="button" onclick="setQtyPct(0.75)" class="flex-1 py-1.5 bg-gray-100 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-200">75%</button>
+            <button type="button" onclick="setQtyPct(1)" class="flex-1 py-1.5 bg-gray-100 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-200">최대</button>
+          </div>
+        </div>
+
+        <!-- 계산 요약 -->
+        <div class="bg-gray-50 rounded-2xl p-5 mb-6 space-y-3 text-sm">
+          <div class="flex justify-between"><span class="text-gray-500">현재가</span><span class="font-medium" id="unitPrice">₩ 12,480</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">수량</span><span class="font-medium" id="qtyDisplay">1주</span></div>
+          <div class="border-t border-gray-200 pt-3 flex justify-between">
+            <span class="font-bold text-dark">총 거래금액</span>
+            <span class="font-black text-dark text-base" id="totalPrice">₩ 12,480</span>
+          </div>
+        </div>
+
+        <!-- 주의사항 -->
+        <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4 mb-6 text-xs text-yellow-700 leading-relaxed">
+          ⚠️ 본 거래는 가상 시뮬레이션으로, 실제 금전 거래가 아닙니다. 가상 포인트로 진행됩니다.
+        </div>
+
+        <button type="submit" id="tradeBtn"
+          class="w-full py-4 bg-brand text-dark font-black rounded-xl text-base hover:brightness-90 transition-all">
+          구매 확정
+        </button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- 거래 완료 모달 -->
+<div id="successOverlay" class="success-overlay" onclick="closeModal()">
+  <div class="pop bg-white rounded-3xl p-10 mx-4 max-w-sm w-full text-center shadow-2xl" onclick="event.stopPropagation()">
+    <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" id="modalIcon">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 class="text-xl font-black text-dark mb-1" id="modalTitle">구매 완료!</h3>
+    <p class="text-sm text-gray-500 mb-2" id="modalBody">중꺾마 1주 구매되었습니다.</p>
+    <p class="text-xl font-black text-dark mb-8" id="modalPrice">₩ 12,480</p>
+    <div class="flex gap-3">
+      <button onclick="window.location.href='portfolio.html'" class="flex-1 py-3 bg-dark text-white font-bold rounded-xl text-sm hover:bg-gray-800">포트폴리오 확인</button>
+      <button onclick="closeModal()" class="flex-1 py-3 bg-gray-100 text-dark font-bold rounded-xl text-sm hover:bg-gray-200">계속 거래</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STOCKS = {
+  '중꺾마': { ticker:'JKM', price:12480, change:'▲ +11.0%', pos:true },
+  '갓생': { ticker:'GDS', price:9750, change:'▲ +6.8%', pos:true },
+  '킹받다': { ticker:'KNG', price:7320, change:'▼ -2.4%', pos:false },
+  '현타': { ticker:'HNT', price:5890, change:'▲ +7.1%', pos:true },
+  '알잘딱깔센': { ticker:'AJDK', price:4250, change:'▲ +5.2%', pos:true },
+  '오운완': { ticker:'OWW', price:6120, change:'▼ -1.3%', pos:false },
+};
+
+const params = new URLSearchParams(location.search);
+const stockKey = params.get('stock') || '중꺾마';
+const tradeType = params.get('type') || 'buy';
+const stock = STOCKS[stockKey] || STOCKS['중꺾마'];
+
+// 초기화
+document.getElementById('stockNameEl').textContent = stockKey;
+document.getElementById('tickerBadge').textContent = stock.ticker;
+document.getElementById('currentPrice').textContent = '₩ ' + stock.price.toLocaleString();
+document.getElementById('unitPrice').textContent = '₩ ' + stock.price.toLocaleString();
+const chEl = document.getElementById('priceChange');
+chEl.textContent = stock.change;
+chEl.className = 'text-xs font-bold ' + (stock.pos ? 'text-green-500' : 'text-red-500');
+document.getElementById('detailLink').href = 'stock-detail.html?stock=' + encodeURIComponent(stockKey);
+document.title = stockKey + ' 거래 - Trendify';
+if (tradeType === 'sell') setType('sell');
+
+function setType(type) {
+  const isBuy = type === 'buy';
+  document.getElementById('tabBuy').className = 'type-btn flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ' + (isBuy ? 'buy-active' : 'text-gray-500');
+  document.getElementById('tabSell').className = 'type-btn flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ' + (!isBuy ? 'sell-active' : 'text-gray-500');
+  document.getElementById('tradeBtn').textContent = isBuy ? '구매 확정' : '판매 확정';
+  document.getElementById('tradeBtn').className = 'w-full py-4 font-black rounded-xl text-base transition-all ' + (isBuy ? 'bg-brand text-dark hover:brightness-90' : 'bg-red-500 text-white hover:bg-red-600');
+  window._tradeType = type;
+}
+window._tradeType = tradeType;
+
+function addQty(n) {
+  const el = document.getElementById('qty');
+  el.value = Math.max(1, parseInt(el.value||1) + n);
+  calcTotal();
+}
+function setQtyPct(pct) {
+  const maxBuy = Math.floor(1000000 / stock.price);
+  const maxSell = 50;
+  const max = window._tradeType === 'buy' ? maxBuy : maxSell;
+  document.getElementById('qty').value = Math.max(1, Math.floor(max * pct));
+  calcTotal();
+}
+function calcTotal() {
+  const q = parseInt(document.getElementById('qty').value) || 1;
+  document.getElementById('qtyDisplay').textContent = q + '주';
+  document.getElementById('totalPrice').textContent = '₩ ' + (stock.price * q).toLocaleString();
+}
+
+function handleTrade(e) {
+  e.preventDefault();
+  const q = parseInt(document.getElementById('qty').value) || 1;
+  const total = stock.price * q;
+  const isBuy = window._tradeType === 'buy';
+  const icon = document.getElementById('modalIcon');
+  icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ' + (isBuy ? 'bg-brand' : 'bg-red-500');
+  icon.querySelector('svg').className = 'w-8 h-8 ' + (isBuy ? 'text-dark' : 'text-white');
+  document.getElementById('modalTitle').textContent = isBuy ? '구매 완료!' : '판매 완료!';
+  document.getElementById('modalBody').textContent = stockKey + ' ' + q + '주 ' + (isBuy ? '구매' : '판매') + '되었습니다.';
+  document.getElementById('modalPrice').textContent = '₩ ' + total.toLocaleString();
+  document.getElementById('successOverlay').classList.add('show');
+}
+function closeModal() { document.getElementById('successOverlay').classList.remove('show'); }
+
+function updateAuthUI() {
+  const ok = localStorage.getItem('isLoggedIn')==='true';
+  document.getElementById('authLoggedOut').classList.toggle('hidden',ok);
+  document.getElementById('authLoggedIn').classList.toggle('hidden',!ok);
+}
+function logout() { localStorage.removeItem('isLoggedIn'); updateAuthUI(); }
+updateAuthUI();
+</script>
+</body>
+</html>

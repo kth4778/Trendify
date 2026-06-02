@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>제보 내역 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body{font-family:"Pretendard",sans-serif;}
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .hero-gradient{background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%)}
+    .report-row{transition:all .2s}
+    .report-row:hover{background:#f9fafb}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3 text-xs font-medium text-gray-500">
+        <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+        <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-dark/60 mb-3 flex items-center gap-2">
+      <a href="mypage.html" class="hover:text-dark">마이페이지</a><span>›</span><span class="text-dark font-bold">제보 내역</span>
+    </nav>
+    <h1 class="text-4xl font-black text-dark mb-2">제보 내역</h1>
+    <p class="text-dark/60 text-sm">직접 제보한 트렌드의 검수 상태를 확인하세요</p>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- 요약 통계 -->
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-black text-dark">7</p>
+        <p class="text-xs text-gray-400 mt-1">전체</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-black text-brand">3</p>
+        <p class="text-xs text-gray-400 mt-1">등록 완료</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-black text-yellow-500">3</p>
+        <p class="text-xs text-gray-400 mt-1">검토 중</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+        <p class="text-2xl font-black text-red-400">1</p>
+        <p class="text-xs text-gray-400 mt-1">반려</p>
+      </div>
+    </div>
+
+    <!-- 필터 -->
+    <div class="flex gap-3 mb-6 overflow-x-auto pb-1">
+      <button onclick="filterStatus(this,'all')" class="f-btn flex-shrink-0 px-5 py-2 bg-dark text-white rounded-full text-sm font-bold">전체</button>
+      <button onclick="filterStatus(this,'done')" class="f-btn flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600">등록 완료</button>
+      <button onclick="filterStatus(this,'review')" class="f-btn flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600">검토 중</button>
+      <button onclick="filterStatus(this,'reject')" class="f-btn flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600">반려</button>
+    </div>
+
+    <!-- 제보 목록 -->
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden" id="reportList">
+
+      <a href="report-detail.html?id=1" class="report-row flex items-center px-6 py-5 border-b border-gray-50 gap-4" data-status="done">
+        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">💬</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">중꺾마</h3>
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full flex-shrink-0">등록 완료</span>
+          </div>
+          <p class="text-xs text-gray-400">중요한 건 꺾이지 않는 마음 · 제보일 2024.01.10</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a href="report-detail.html?id=2" class="report-row flex items-center px-6 py-5 border-b border-gray-50 gap-4" data-status="done">
+        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">✨</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">갓생 챌린지 밈</h3>
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full flex-shrink-0">등록 완료</span>
+          </div>
+          <p class="text-xs text-gray-400">갓생 라이프를 보여주는 인스타 챌린지 밈 · 제보일 2024.02.03</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a href="report-detail.html?id=3" class="report-row flex items-center px-6 py-5 border-b border-gray-50 gap-4" data-status="done">
+        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">💪</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">오운완</h3>
+            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full flex-shrink-0">등록 완료</span>
+          </div>
+          <p class="text-xs text-gray-400">오늘 운동 완료 줄임말 · 제보일 2024.03.05</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a href="report-detail.html?id=4" class="report-row flex items-center px-6 py-5 border-b border-gray-50 gap-4" data-status="review">
+        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">🔍</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">알잘딱깔센</h3>
+            <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full flex-shrink-0">검토 중</span>
+          </div>
+          <p class="text-xs text-gray-400">알아서 잘 딱 깔끔하고 센스있게 · 제보일 2024.04.20</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a href="report-detail.html?id=5" class="report-row flex items-center px-6 py-5 border-b border-gray-50 gap-4" data-status="review">
+        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">🔍</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">킹받는 상황 모음 밈</h3>
+            <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full flex-shrink-0">검토 중</span>
+          </div>
+          <p class="text-xs text-gray-400">공감 100% 킹받는 상황 이미지 모음 · 제보일 2024.05.01</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a href="report-detail.html?id=6" class="report-row flex items-center px-6 py-5 border-b border-gray-50 gap-4" data-status="review">
+        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">🔍</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">현타 오는 월요일 밈</h3>
+            <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full flex-shrink-0">검토 중</span>
+          </div>
+          <p class="text-xs text-gray-400">월요병 현타 이미지 밈 시리즈 · 제보일 2024.05.20</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a href="report-detail.html?id=7" class="report-row flex items-center px-6 py-5 gap-4" data-status="reject">
+        <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0 text-lg">❌</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-sm font-bold text-dark truncate">너무 어려운 신조어 테스트</h3>
+            <span class="px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full flex-shrink-0">반려</span>
+          </div>
+          <p class="text-xs text-gray-400">반려 사유: 출처 불명확, 사용 사례 부족 · 제보일 2024.04.10</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+    </div>
+
+    <!-- 새 제보 버튼 -->
+    <div class="mt-6 text-center">
+      <a href="report-form.html" class="inline-block px-8 py-3.5 bg-brand text-dark font-black rounded-xl hover:brightness-90 transition-all">+ 새 밈 제보하기</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+function filterStatus(btn, status) {
+  document.querySelectorAll('.f-btn').forEach(b => {
+    b.className = 'f-btn flex-shrink-0 px-5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600';
+  });
+  btn.className = 'f-btn flex-shrink-0 px-5 py-2 bg-dark text-white rounded-full text-sm font-bold';
+  document.querySelectorAll('#reportList > a').forEach(row => {
+    row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+  });
+}
+function logout() { localStorage.removeItem('isLoggedIn'); window.location.href='index.html'; }
+</script>
+</body>
+</html>

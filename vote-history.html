@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>투표 기록 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:'#00FF00',dark:'#111111',surface:'#F9FAFB'},borderRadius:{'2xl':'18px','3xl':'24px'}}}}</script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body{font-family:"Pretendard",sans-serif;}
+    .nav-link{position:relative}.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#00FF00;transition:width .2s}.nav-link:hover::after{width:100%}
+    .hero-gradient{background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%)}
+    .vote-row{transition:all .2s}.vote-row:hover{background:#f9fafb}
+    .bar{transition:width 1s ease}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16 gap-6">
+      <a href="index.html" class="text-brand font-black text-2xl tracking-tighter flex-shrink-0">Trendify</a>
+      <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+        <a class="nav-link hover:text-brand" href="dictionary.html">유행어 사전</a>
+        <a class="nav-link hover:text-brand" href="meme-stock.html">밈주식</a>
+        <a class="nav-link hover:text-brand" href="vote.html">트렌드 투표</a>
+        <a class="nav-link hover:text-brand" href="upload.html">업로드</a>
+      </div>
+      <div class="hidden md:flex items-center gap-3 text-xs font-medium text-gray-500">
+        <a href="mypage.html" class="px-3 py-1.5 bg-gray-100 rounded-full text-dark hover:bg-gray-200">마이페이지</a>
+        <button onclick="logout()" class="hover:text-dark">로그아웃</button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="hero-gradient py-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <nav class="text-xs text-dark/60 mb-3 flex items-center gap-2">
+      <a href="mypage.html" class="hover:text-dark">마이페이지</a><span>›</span><span class="text-dark font-bold">투표 기록</span>
+    </nav>
+    <h1 class="text-4xl font-black text-dark mb-2">투표 기록</h1>
+    <p class="text-dark/60 text-sm">참여한 트렌드 대결과 투표 결과</p>
+  </div>
+</div>
+
+<main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- 통계 -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+        <p class="text-3xl font-black text-dark">12</p>
+        <p class="text-xs text-gray-400 mt-1">총 투표 참여</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+        <p class="text-3xl font-black text-brand">8</p>
+        <p class="text-xs text-gray-400 mt-1">승리 (다수파)</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+        <p class="text-3xl font-black text-gray-400">4</p>
+        <p class="text-xs text-gray-400 mt-1">소수파</p>
+      </div>
+    </div>
+
+    <!-- 투표 목록 -->
+    <div class="space-y-4">
+
+      <a href="vote-detail.html?id=1" class="block bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:border-brand transition-all">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-base font-black text-dark">중꺾마 vs 갓생</h3>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-bold rounded-full">종료</span>
+            </div>
+            <p class="text-xs text-gray-400">참여일 2024.05.20 · MZ어</p>
+          </div>
+          <div class="text-right">
+            <span class="px-3 py-1 bg-brand text-dark text-xs font-black rounded-full">✓ 중꺾마 선택</span>
+            <p class="text-xs text-gray-400 mt-1">다수파 🎉</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 w-16 text-right">중꺾마</span>
+            <div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="bar h-full bg-brand rounded-full" style="width:0%" data-w="61%"></div></div>
+            <span class="text-xs font-bold text-dark w-8">61%</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 w-16 text-right">갓생</span>
+            <div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="bar h-full bg-indigo-300 rounded-full" style="width:0%" data-w="39%"></div></div>
+            <span class="text-xs font-bold text-dark w-8">39%</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="vote-detail.html?id=2" class="block bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:border-brand transition-all">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-base font-black text-dark">킹받다 vs 현타</h3>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-bold rounded-full">종료</span>
+            </div>
+            <p class="text-xs text-gray-400">참여일 2024.05.10 · 감정표현</p>
+          </div>
+          <div class="text-right">
+            <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-black rounded-full">✓ 킹받다 선택</span>
+            <p class="text-xs text-gray-400 mt-1">소수파 😅</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 w-16 text-right">킹받다</span>
+            <div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="bar h-full bg-brand rounded-full" style="width:0%" data-w="41%"></div></div>
+            <span class="text-xs font-bold text-dark w-8">41%</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 w-16 text-right">현타</span>
+            <div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="bar h-full bg-indigo-300 rounded-full" style="width:0%" data-w="59%"></div></div>
+            <span class="text-xs font-bold text-dark w-8">59%</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="vote-detail.html?id=3" class="block bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:border-brand transition-all">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-base font-black text-dark">오운완 vs 알잘딱깔센</h3>
+              <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">진행 중</span>
+            </div>
+            <p class="text-xs text-gray-400">참여일 2024.05.30 · MZ어</p>
+          </div>
+          <div class="text-right">
+            <span class="px-3 py-1 bg-brand text-dark text-xs font-black rounded-full">✓ 오운완 선택</span>
+            <p class="text-xs text-gray-400 mt-1">집계 중...</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 w-16 text-right">오운완</span>
+            <div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="bar h-full bg-brand rounded-full" style="width:0%" data-w="52%"></div></div>
+            <span class="text-xs font-bold text-dark w-8">52%</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 w-16 text-right">알잘딱깔센</span>
+            <div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="bar h-full bg-indigo-300 rounded-full" style="width:0%" data-w="48%"></div></div>
+            <span class="text-xs font-bold text-dark w-8">48%</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="vote.html" class="inline-block px-8 py-3.5 bg-dark text-white font-black rounded-xl hover:bg-gray-800 transition-all">더 많은 투표 참여하기</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="border-t border-gray-100 py-6 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between text-[11px] text-gray-400">
+    <p>© 2024 Trendify. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+setTimeout(() => {
+  document.querySelectorAll('.bar').forEach(b => { b.style.width = b.dataset.w; });
+}, 400);
+function logout() { localStorage.removeItem('isLoggedIn'); window.location.href='index.html'; }
+</script>
+</body>
+</html>
