@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>투표 주제 제안 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: '#00FF00', dark: '#111111', surface: '#F9FAFB' },
+          borderRadius: { '2xl': '18px', '3xl': '24px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family: "Pretendard", -apple-system, sans-serif; background: #F9FAFB; }
+    .nav-link { position: relative; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:#00FF00; transition:width .2s ease; }
+    .nav-link:hover::after { width:100%; }
+
+    .field-input {
+      width:100%; padding:.75rem 1rem;
+      border:1.5px solid #E5E7EB; border-radius:12px;
+      font-size:.875rem; color:#111; outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease;
+      font-family: inherit;
+    }
+    .field-input:focus { border-color:#00FF00; box-shadow:0 0 0 3px rgba(0,255,0,.1); }
+    .field-input.error { border-color:#EF4444; }
+
+    .category-chip {
+      cursor:pointer; padding:.5rem 1rem; border-radius:9999px;
+      border:1.5px solid #E5E7EB; font-size:.75rem; font-weight:700;
+      transition:all .15s ease; background:#fff; color:#6B7280;
+    }
+    .category-chip.selected { background:#111; color:#00FF00; border-color:#111; }
+
+    .vs-preview {
+      background: linear-gradient(135deg, #111 0%, #374151 100%);
+      border-radius: 20px; padding: 1.5rem;
+      color: white;
+    }
+
+    /* 완료 모달 */
+    #successModal { display:none; }
+    #successModal.show { display:flex; }
+
+    .tag-chip { background:#F3F4F6; color:#374151; border-radius:9999px; padding:.25rem .75rem; font-size:.75rem; font-weight:600; display:inline-flex; align-items:center; gap:.375rem; }
+    .tag-chip button { color:#9CA3AF; hover:color:#374151; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-4 text-xs font-medium text-gray-500">
+          <div id="authLoggedOut" class="flex items-center space-x-4">
+            <a class="hover:text-dark transition-colors" href="login.html">로그인</a>
+            <a class="hover:text-dark transition-colors" href="signup.html">회원가입</a>
+          </div>
+          <div id="authLoggedIn" class="hidden flex items-center space-x-3">
+            <a class="px-4 py-2 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors" href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="hover:text-dark transition-colors">로그아웃</button>
+          </div>
+        </div>
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="hover:text-brand" href="dictionary.html">유행어 사전</a>
+          <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
+          <a class="text-dark font-black" href="vote.html">트렌드 투표</a>
+          <a class="hover:text-brand" href="upload.html">업로드</a>
+          <div id="mobileAuthLoggedOut" class="flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="login.html">로그인</a><a href="signup.html">회원가입</a>
+          </div>
+          <div id="mobileAuthLoggedIn" class="hidden flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="text-gray-500">로그아웃</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%)" class="py-10 px-4">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex items-center gap-2 mb-2 text-xs font-bold text-dark/60">
+        <a href="vote.html" class="hover:text-dark">트렌드 투표</a>
+        <span class="text-dark/40">›</span>
+        <span class="text-dark">투표 주제 제안</span>
+      </div>
+      <h1 class="text-3xl font-black text-dark mb-1">투표 주제 제안</h1>
+      <p class="text-sm text-dark/60 font-medium">대결시키고 싶은 두 트렌드를 올려주세요. 심사 후 정식 투표로 등록됩니다.</p>
+    </div>
+  </div>
+
+  <main class="flex-1 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+
+      <form id="voteTopicForm" onsubmit="submitForm(event)" novalidate>
+
+        <!-- 섹션 1: 대결 구성 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-7 mb-5">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-dark font-black text-xs">1</div>
+            <h2 class="text-base font-black text-dark">대결 구성</h2>
+          </div>
+
+          <!-- 투표 제목 -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+              투표 제목 <span class="text-red-400 normal-case font-normal">(필수)</span>
+            </label>
+            <input id="voteTitle" type="text" maxlength="40" placeholder="예) 2025 최강 유행어 대결" class="field-input"
+              oninput="updatePreview();clearError('voteTitleError')"/>
+            <p id="voteTitleError" class="hidden mt-1 text-xs text-red-500">투표 제목을 입력해주세요.</p>
+            <p class="mt-1 text-[11px] text-gray-400 text-right"><span id="titleCount">0</span>/40자</p>
+          </div>
+
+          <!-- A vs B 입력 -->
+          <div class="grid grid-cols-5 gap-3 items-center mb-5">
+            <!-- A 후보 -->
+            <div class="col-span-2">
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">A 후보 <span class="text-red-400">*</span></label>
+              <input id="candidateA" type="text" maxlength="15" placeholder="예) 중꺾마" class="field-input text-center font-black"
+                oninput="updatePreview();clearError('candidateAError')"/>
+              <p id="candidateAError" class="hidden mt-1 text-xs text-red-500 text-center">A 후보를 입력하세요.</p>
+            </div>
+
+            <!-- VS -->
+            <div class="col-span-1 flex flex-col items-center pt-5">
+              <div class="w-10 h-10 rounded-full bg-dark flex items-center justify-center">
+                <span class="text-brand font-black text-xs">VS</span>
+              </div>
+            </div>
+
+            <!-- B 후보 -->
+            <div class="col-span-2">
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">B 후보 <span class="text-red-400">*</span></label>
+              <input id="candidateB" type="text" maxlength="15" placeholder="예) 갓생" class="field-input text-center font-black"
+                oninput="updatePreview();clearError('candidateBError')"/>
+              <p id="candidateBError" class="hidden mt-1 text-xs text-red-500 text-center">B 후보를 입력하세요.</p>
+            </div>
+          </div>
+
+          <!-- 실시간 미리보기 -->
+          <div class="vs-preview">
+            <p class="text-xs font-bold text-white/50 mb-3 uppercase tracking-wider">미리보기</p>
+            <p id="previewTitle" class="text-sm font-black text-white mb-4 min-h-[20px]">투표 제목이 여기에 표시됩니다</p>
+            <div class="flex items-center gap-3">
+              <div class="flex-1 bg-brand/20 rounded-xl p-3 text-center">
+                <p id="previewA" class="text-brand font-black text-lg">A 후보</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center">
+                <span class="text-brand font-black text-[10px]">VS</span>
+              </div>
+              <div class="flex-1 bg-white/10 rounded-xl p-3 text-center">
+                <p id="previewB" class="text-white font-black text-lg">B 후보</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 2: 카테고리 & 설명 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-7 mb-5">
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-dark font-black text-xs">2</div>
+            <h2 class="text-base font-black text-dark">카테고리 & 설명</h2>
+          </div>
+
+          <!-- 카테고리 -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+              카테고리 <span class="text-red-400">*</span>
+            </label>
+            <div class="flex flex-wrap gap-2" id="categoryGroup">
+              <button type="button" class="category-chip selected" onclick="selectCategory(this,'유행어')">유행어</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'밈')">밈</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'문화')">문화</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'연예')">연예</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'음식')">음식</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'스포츠')">스포츠</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'게임')">게임</button>
+              <button type="button" class="category-chip" onclick="selectCategory(this,'기타')">기타</button>
+            </div>
+            <input type="hidden" id="selectedCategory" value="유행어"/>
+          </div>
+
+          <!-- 설명 -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+              대결 배경 설명 <span class="normal-case font-normal text-gray-400">(선택 · 최대 200자)</span>
+            </label>
+            <textarea id="voteDesc" maxlength="200" rows="4" placeholder="이 대결을 제안하는 이유나 배경을 설명해주세요. 심사에 참고됩니다."
+              class="field-input resize-none" oninput="countDesc()"></textarea>
+            <p class="mt-1 text-[11px] text-gray-400 text-right"><span id="descCount">0</span>/200자</p>
+          </div>
+
+          <!-- 마감일 -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+              희망 마감일 <span class="normal-case font-normal text-gray-400">(선택)</span>
+            </label>
+            <div class="flex gap-2">
+              <button type="button" class="dday-chip px-4 py-2 rounded-xl border-2 border-brand bg-brand/10 text-dark text-xs font-bold" onclick="setDDay(3,this)">3일</button>
+              <button type="button" class="dday-chip px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-500 text-xs font-bold" onclick="setDDay(7,this)">7일</button>
+              <button type="button" class="dday-chip px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-500 text-xs font-bold" onclick="setDDay(14,this)">14일</button>
+              <button type="button" class="dday-chip px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-500 text-xs font-bold" onclick="setDDay(30,this)">30일</button>
+            </div>
+            <input type="hidden" id="selectedDDay" value="3"/>
+          </div>
+
+          <!-- 태그 -->
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+              태그 <span class="normal-case font-normal text-gray-400">(선택 · 최대 5개)</span>
+            </label>
+            <div id="tagChips" class="flex flex-wrap gap-2 mb-2"></div>
+            <div class="flex gap-2">
+              <input id="tagInput" type="text" placeholder="태그 입력 후 Enter" maxlength="10"
+                class="field-input flex-1"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();addTag();}"/>
+              <button type="button" onclick="addTag()"
+                class="px-4 py-2 bg-dark text-brand text-xs font-bold rounded-xl hover:bg-gray-800 transition-colors">추가</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 안내 -->
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
+          <p class="text-xs font-bold text-amber-700 mb-1">📋 심사 안내</p>
+          <ul class="text-xs text-amber-600 space-y-1 list-disc list-inside">
+            <li>제안된 투표 주제는 Trendify 운영팀의 심사를 거쳐 등록됩니다.</li>
+            <li>심사 기간은 영업일 기준 1~3일 소요됩니다.</li>
+            <li>결과는 마이페이지 &gt; 제보 내역에서 확인하실 수 있습니다.</li>
+            <li>부적절한 내용이 포함된 경우 반려될 수 있습니다.</li>
+          </ul>
+        </div>
+
+        <!-- 버튼 -->
+        <div class="flex gap-3">
+          <a href="vote.html"
+            class="flex-1 py-4 border-2 border-gray-200 rounded-2xl text-sm font-bold text-gray-500 hover:border-dark hover:text-dark transition-colors text-center">
+            취소
+          </a>
+          <button type="submit"
+            class="flex-1 py-4 bg-dark text-white rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors">
+            투표 주제 제안하기
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 py-6 mt-10">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 성공 모달 -->
+  <div id="successModal" class="fixed inset-0 z-50 items-center justify-center p-4" style="display:none">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm mx-auto p-8 text-center">
+      <div class="w-16 h-16 rounded-full bg-brand flex items-center justify-center mx-auto mb-5">
+        <svg class="w-8 h-8 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-black text-dark mb-2">제안 완료!</h2>
+      <p class="text-sm text-gray-500 mb-1">투표 주제가 성공적으로 제출되었습니다.</p>
+      <p class="text-xs text-gray-400 mb-6">심사 결과는 마이페이지에서 확인하세요.</p>
+      <div id="successPreview" class="bg-dark rounded-2xl p-4 mb-6 text-left">
+        <p id="successTitle" class="text-white text-xs font-bold mb-2"></p>
+        <div class="flex items-center gap-2">
+          <div class="flex-1 bg-brand/20 rounded-lg p-2 text-center"><p id="successA" class="text-brand text-sm font-black"></p></div>
+          <span class="text-brand font-black text-xs">VS</span>
+          <div class="flex-1 bg-white/10 rounded-lg p-2 text-center"><p id="successB" class="text-white text-sm font-black"></p></div>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <a href="vote.html" class="flex-1 py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+          투표 목록
+        </a>
+        <a href="my-reports.html" class="flex-1 py-3 bg-dark text-white rounded-xl text-sm font-black hover:bg-gray-800 transition-colors">
+          제보 내역 확인
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  let tags = [];
+
+  // ── 실시간 미리보기 ──
+  function updatePreview() {
+    const title = document.getElementById('voteTitle').value || '투표 제목이 여기에 표시됩니다';
+    const a = document.getElementById('candidateA').value || 'A 후보';
+    const b = document.getElementById('candidateB').value || 'B 후보';
+    document.getElementById('previewTitle').textContent = title;
+    document.getElementById('previewA').textContent = a;
+    document.getElementById('previewB').textContent = b;
+    document.getElementById('titleCount').textContent = document.getElementById('voteTitle').value.length;
+  }
+
+  function countDesc() {
+    document.getElementById('descCount').textContent = document.getElementById('voteDesc').value.length;
+  }
+
+  // ── 카테고리 선택 ──
+  function selectCategory(el, val) {
+    document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('selectedCategory').value = val;
+  }
+
+  // ── 마감일 선택 ──
+  function setDDay(n, el) {
+    document.querySelectorAll('.dday-chip').forEach(c => {
+      c.classList.remove('border-brand','bg-brand/10','text-dark');
+      c.classList.add('border-gray-200','bg-white','text-gray-500');
+    });
+    el.classList.add('border-brand','bg-brand/10','text-dark');
+    el.classList.remove('border-gray-200','bg-white','text-gray-500');
+    document.getElementById('selectedDDay').value = n;
+  }
+
+  // ── 태그 추가/삭제 ──
+  function addTag() {
+    const input = document.getElementById('tagInput');
+    const val = input.value.trim().replace(/^#/,'');
+    if (!val || tags.includes(val) || tags.length >= 5) { input.value=''; return; }
+    tags.push(val);
+    renderTags();
+    input.value = '';
+  }
+  function removeTag(t) {
+    tags = tags.filter(x => x !== t);
+    renderTags();
+  }
+  function renderTags() {
+    document.getElementById('tagChips').innerHTML = tags.map(t =>
+      `<span class="tag-chip">#${t} <button type="button" onclick="removeTag('${t}')" class="text-gray-400 hover:text-gray-600">×</button></span>`
+    ).join('');
+  }
+
+  // ── 에러 처리 ──
+  function clearError(id) { document.getElementById(id)?.classList.add('hidden'); }
+  function showError(id)  { document.getElementById(id)?.classList.remove('hidden'); }
+
+  // ── 폼 제출 ──
+  function submitForm(e) {
+    e.preventDefault();
+    let valid = true;
+    const title = document.getElementById('voteTitle').value.trim();
+    const a = document.getElementById('candidateA').value.trim();
+    const b = document.getElementById('candidateB').value.trim();
+
+    if (!title) { showError('voteTitleError'); valid = false; }
+    if (!a)     { showError('candidateAError'); valid = false; }
+    if (!b)     { showError('candidateBError'); valid = false; }
+    if (!valid) return;
+
+    // 성공 모달
+    document.getElementById('successTitle').textContent = title;
+    document.getElementById('successA').textContent = a;
+    document.getElementById('successB').textContent = b;
+    document.getElementById('successModal').style.display = 'flex';
+  }
+
+  // ── 로그인 UI ──
+  function updateAuthUI() {
+    const on = localStorage.getItem('isLoggedIn') === 'true';
+    document.getElementById('authLoggedOut').classList.toggle('hidden', on);
+    document.getElementById('authLoggedIn').classList.toggle('hidden', !on);
+    document.getElementById('mobileAuthLoggedOut').classList.toggle('hidden', on);
+    document.getElementById('mobileAuthLoggedIn').classList.toggle('hidden', !on);
+  }
+  function logout() { localStorage.removeItem('isLoggedIn'); window.location.href = 'index.html'; }
+
+  updateAuthUI();
+  </script>
+</body>
+</html>

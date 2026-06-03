@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>전체 투표 - Trendify</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: '#00FF00', dark: '#111111', surface: '#F9FAFB' },
+          borderRadius: { '2xl': '18px', '3xl': '24px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family: "Pretendard", -apple-system, sans-serif; background: #F9FAFB; }
+    .nav-link { position: relative; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:#00FF00; transition:width .2s ease; }
+    .nav-link:hover::after { width:100%; }
+
+    .vote-card { background:#fff; border:2px solid transparent; transition:all .3s cubic-bezier(.175,.885,.32,1.275); }
+    .vote-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px -12px rgba(0,255,0,.15); border-color:#00FF00; }
+
+    .tab-btn { transition:all .2s ease; }
+    .tab-btn.active { background:#111; color:#fff; }
+
+    .sort-btn { transition:all .15s ease; }
+    .sort-btn.active { background:#00FF00; color:#111; font-weight:700; }
+
+    .badge-live   { background:#F0FDF4; color:#15803D; }
+    .badge-closed { background:#F3F4F6; color:#6B7280; }
+    .badge-soon   { background:#FEF3C7; color:#D97706; }
+
+    .bar-a { background: linear-gradient(90deg,#00FF00,#00DDAA); transition:width .8s ease; }
+    .bar-b { background: linear-gradient(90deg,#111,#374151); transition:width .8s ease; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 gap-6">
+        <div class="flex-shrink-0">
+          <a href="index.html" class="text-brand font-black text-2xl tracking-tighter">Trendify</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-700 flex-1">
+          <a class="nav-link hover:text-brand transition-colors" href="dictionary.html">유행어 사전</a>
+          <a class="nav-link hover:text-brand transition-colors" href="meme-stock.html">밈주식</a>
+          <a class="font-bold text-dark border-b-2 border-dark pb-0.5" href="vote.html">트렌드 투표</a>
+          <a class="nav-link hover:text-brand transition-colors" href="upload.html">업로드</a>
+        </div>
+        <div class="hidden md:flex items-center space-x-4 text-xs font-medium text-gray-500">
+          <div id="authLoggedOut" class="flex items-center space-x-4">
+            <a class="hover:text-dark transition-colors" href="login.html">로그인</a>
+            <a class="hover:text-dark transition-colors" href="signup.html">회원가입</a>
+          </div>
+          <div id="authLoggedIn" class="hidden flex items-center space-x-3">
+            <a class="px-4 py-2 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors" href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="hover:text-dark transition-colors">로그아웃</button>
+          </div>
+        </div>
+        <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col space-y-3 text-sm font-semibold text-gray-700">
+          <a class="hover:text-brand" href="dictionary.html">유행어 사전</a>
+          <a class="hover:text-brand" href="meme-stock.html">밈주식</a>
+          <a class="text-dark font-black" href="vote.html">트렌드 투표</a>
+          <a class="hover:text-brand" href="upload.html">업로드</a>
+          <div id="mobileAuthLoggedOut" class="flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="login.html">로그인</a><a href="signup.html">회원가입</a>
+          </div>
+          <div id="mobileAuthLoggedIn" class="hidden flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="text-gray-500">로그아웃</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero-gradient py-10 px-4" style="background:linear-gradient(135deg,#00FF00 0%,#00CCFF 100%)">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <a href="vote.html" class="text-xs font-bold text-dark/60 hover:text-dark transition-colors">트렌드 투표</a>
+          <span class="text-dark/40 text-xs">›</span>
+          <span class="text-xs font-bold text-dark">전체 투표</span>
+        </div>
+        <h1 class="text-3xl font-black text-dark mb-1">전체 투표 목록</h1>
+        <p class="text-dark/60 text-sm font-medium">지금까지 진행된 모든 트렌드 대결을 확인하세요</p>
+      </div>
+      <a href="vote-topic-upload.html"
+        class="hidden md:flex items-center gap-2 px-5 py-2.5 bg-dark text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        투표 주제 제안
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex gap-6 text-xs font-semibold text-gray-500">
+      <span>전체 <strong class="text-dark">24</strong>개</span>
+      <span>진행중 <strong class="text-green-600">8</strong>개</span>
+      <span>마감 <strong class="text-gray-400">14</strong>개</span>
+      <span>마감임박 <strong class="text-amber-500">2</strong>개</span>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- 필터 + 정렬 -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <!-- 탭 필터 -->
+        <div class="flex gap-2">
+          <button class="tab-btn active px-4 py-2 rounded-full text-sm font-bold border border-gray-200" onclick="filterVotes('all',this)">전체</button>
+          <button class="tab-btn px-4 py-2 rounded-full text-sm font-bold bg-white border border-gray-200 text-gray-500" onclick="filterVotes('live',this)">진행중</button>
+          <button class="tab-btn px-4 py-2 rounded-full text-sm font-bold bg-white border border-gray-200 text-gray-500" onclick="filterVotes('closed',this)">마감</button>
+          <button class="tab-btn px-4 py-2 rounded-full text-sm font-bold bg-white border border-gray-200 text-gray-500" onclick="filterVotes('soon',this)">마감임박</button>
+        </div>
+        <!-- 정렬 -->
+        <div class="flex gap-2 text-xs">
+          <button class="sort-btn active px-3 py-1.5 rounded-lg border border-gray-200 bg-brand text-dark font-bold" onclick="sortVotes('popular',this)">인기순</button>
+          <button class="sort-btn px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-500" onclick="sortVotes('recent',this)">최신순</button>
+          <button class="sort-btn px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-500" onclick="sortVotes('ending',this)">마감임박</button>
+        </div>
+      </div>
+
+      <!-- 카드 그리드 -->
+      <div id="voteGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <!-- 카드들은 JS로 렌더 -->
+      </div>
+
+      <!-- 더보기 -->
+      <div class="text-center mt-10">
+        <button id="loadMoreBtn" onclick="loadMore()"
+          class="px-8 py-3 border-2 border-gray-200 rounded-xl text-sm font-bold text-gray-500 hover:border-dark hover:text-dark transition-colors">
+          더 보기 (남은 12개)
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 py-6 mt-10">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-400">
+      <p>© 2024 Trendify. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-dark" href="#">이용약관</a>
+        <a class="hover:text-dark font-bold text-gray-500" href="#">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  // ── 투표 데이터 ──
+  const ALL_VOTES = [
+    { id:1, status:'live', category:'유행어', title:'2025 최강 유행어 대결', a:'중꺾마', b:'갓생', aVote:62, bVote:38, total:4821, dday:'D-3', tags:['#유행어','#2025'] },
+    { id:2, status:'live', category:'밈', title:'짤계의 황제를 뽑아라', a:'너 뭐 돼?', b:'오운완', aVote:55, bVote:45, total:3204, dday:'D-1', tags:['#밈','#짤'] },
+    { id:3, status:'closed', category:'문화', title:'MZ 세대 라이프스타일', a:'갓생', b:'현타', aVote:71, bVote:29, total:6102, dday:'종료', tags:['#MZ','#갓생'] },
+    { id:4, status:'soon', category:'유행어', title:'폼 미쳤다 vs 알잘딱깔센', a:'폼미쳤다', b:'알잘딱깔센', aVote:48, bVote:52, total:2900, dday:'D-1', tags:['#유행어'] },
+    { id:5, status:'live', category:'밈', title:'민초단 vs 반민초단', a:'민초단', b:'반민초단', aVote:34, bVote:66, total:8801, dday:'D-5', tags:['#밈','#민초'] },
+    { id:6, status:'closed', category:'연예', title:'트로트 vs 아이돌', a:'트로트', b:'아이돌', aVote:42, bVote:58, total:5430, dday:'종료', tags:['#연예'] },
+    { id:7, status:'live', category:'음식', title:'마라탕 vs 떡볶이', a:'마라탕', b:'떡볶이', aVote:59, bVote:41, total:7200, dday:'D-4', tags:['#음식','#마라탕'] },
+    { id:8, status:'closed', category:'유행어', title:'내또출근 vs 퇴사각', a:'내또출근', b:'퇴사각', aVote:44, bVote:56, total:3980, dday:'종료', tags:['#직장인'] },
+    { id:9, status:'soon', category:'밈', title:'킹받다 vs 현타', a:'킹받다', b:'현타', aVote:50, bVote:50, total:1200, dday:'D-1', tags:['#밈'] },
+    { id:10, status:'live', category:'스포츠', title:'축구 vs 야구', a:'축구', b:'야구', aVote:67, bVote:33, total:9100, dday:'D-7', tags:['#스포츠'] },
+    { id:11, status:'closed', category:'게임', title:'롤 vs 배그', a:'롤', b:'배그', aVote:54, bVote:46, total:11200, dday:'종료', tags:['#게임'] },
+    { id:12, status:'closed', category:'문화', title:'넷플릭스 vs 유튜브', a:'넷플릭스', b:'유튜브', aVote:38, bVote:62, total:7800, dday:'종료', tags:['#미디어'] },
+  ];
+
+  let currentFilter = 'all';
+  let currentSort = 'popular';
+  let displayCount = 9;
+
+  function getFiltered() {
+    let list = ALL_VOTES.filter(v => currentFilter === 'all' || v.status === currentFilter);
+    if (currentSort === 'popular') list.sort((a,b) => b.total - a.total);
+    else if (currentSort === 'recent') list.sort((a,b) => b.id - a.id);
+    else if (currentSort === 'ending') list.sort((a,b) => {
+      const order = { soon:0, live:1, closed:2 };
+      return order[a.status] - order[b.status];
+    });
+    return list;
+  }
+
+  function badgeHTML(status, dday) {
+    if (status === 'live')   return `<span class="badge-live   text-[10px] font-bold px-2 py-0.5 rounded-full">● 진행중 ${dday}</span>`;
+    if (status === 'soon')   return `<span class="badge-soon   text-[10px] font-bold px-2 py-0.5 rounded-full">⏰ 마감임박 ${dday}</span>`;
+    if (status === 'closed') return `<span class="badge-closed text-[10px] font-bold px-2 py-0.5 rounded-full">■ 종료</span>`;
+    return '';
+  }
+
+  function cardHTML(v) {
+    return `
+      <div class="vote-card rounded-3xl p-6 shadow-sm cursor-pointer" data-status="${v.status}" onclick="location.href='vote-detail.html?id=${v.id}'">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${v.category}</span>
+          ${badgeHTML(v.status, v.dday)}
+        </div>
+        <h3 class="text-sm font-black text-dark mb-4 leading-snug">${v.title}</h3>
+        <!-- VS 배지 -->
+        <div class="flex items-center gap-2 mb-4">
+          <div class="flex-1 bg-brand/10 rounded-xl px-3 py-2 text-center">
+            <p class="text-xs font-black text-dark">${v.a}</p>
+            <p class="text-lg font-black text-dark mt-0.5">${v.aVote}%</p>
+          </div>
+          <div class="w-8 h-8 rounded-full bg-dark flex items-center justify-center flex-shrink-0">
+            <span class="text-brand font-black text-[10px]">VS</span>
+          </div>
+          <div class="flex-1 bg-gray-100 rounded-xl px-3 py-2 text-center">
+            <p class="text-xs font-black text-gray-500">${v.b}</p>
+            <p class="text-lg font-black text-gray-700 mt-0.5">${v.bVote}%</p>
+          </div>
+        </div>
+        <!-- 결과 바 -->
+        <div class="flex rounded-full overflow-hidden h-2 mb-3">
+          <div class="bar-a" style="width:${v.aVote}%"></div>
+          <div class="bar-b" style="width:${v.bVote}%"></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="flex gap-1.5 flex-wrap">
+            ${v.tags.map(t=>`<span class="text-[10px] font-bold text-gray-400">${t}</span>`).join('')}
+          </div>
+          <span class="text-[10px] text-gray-400 font-medium">${v.total.toLocaleString()}명 참여</span>
+        </div>
+      </div>`;
+  }
+
+  function render() {
+    const list = getFiltered();
+    const showing = list.slice(0, displayCount);
+    document.getElementById('voteGrid').innerHTML = showing.length
+      ? showing.map(cardHTML).join('')
+      : `<div class="col-span-3 text-center py-20 text-gray-400">
+           <p class="text-4xl mb-3">🗳️</p>
+           <p class="font-bold">해당 조건의 투표가 없습니다</p>
+         </div>`;
+    const btn = document.getElementById('loadMoreBtn');
+    const remaining = list.length - showing.length;
+    if (remaining > 0) { btn.style.display=''; btn.textContent = `더 보기 (남은 ${remaining}개)`; }
+    else { btn.style.display='none'; }
+  }
+
+  function filterVotes(f, el) {
+    currentFilter = f; displayCount = 9;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  function sortVotes(s, el) {
+    currentSort = s; displayCount = 9;
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  function loadMore() { displayCount += 6; render(); }
+
+  // ── 로그인 UI ──
+  function updateAuthUI() {
+    const on = localStorage.getItem('isLoggedIn') === 'true';
+    document.getElementById('authLoggedOut').classList.toggle('hidden', on);
+    document.getElementById('authLoggedIn').classList.toggle('hidden', !on);
+    document.getElementById('mobileAuthLoggedOut').classList.toggle('hidden', on);
+    document.getElementById('mobileAuthLoggedIn').classList.toggle('hidden', !on);
+  }
+  function logout() { localStorage.removeItem('isLoggedIn'); window.location.href='index.html'; }
+
+  updateAuthUI();
+  render();
+  </script>
+</body>
+</html>
