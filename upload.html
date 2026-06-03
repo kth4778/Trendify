@@ -98,20 +98,17 @@
         </div>
 
         <!-- ③ 검색창 + ④ 프로필 버튼 -->
-        <div class="hidden md:flex items-center gap-3">
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-              </svg>
-            </div>
-            <input type="text" placeholder="검색" class="pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm w-48 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-all border border-transparent focus:border-gray-200"/>
+                  <div class="hidden md:flex items-center space-x-4 text-xs font-medium text-gray-500">
+          <!-- 비로그인 상태 -->
+          <div id="authLoggedOut" class="flex items-center space-x-4">
+            <a class="hover:text-dark transition-colors" href="login.html">로그인</a>
+            <a class="hover:text-dark transition-colors" href="signup.html">회원가입</a>
           </div>
-          <a href="mypage.html" class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors flex-shrink-0">
-            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-            </svg>
-          </a>
+          <!-- 로그인 상태 -->
+          <div id="authLoggedIn" class="hidden flex items-center space-x-3">
+            <a class="px-4 py-2 bg-gray-100 rounded-full text-dark hover:bg-gray-200 transition-colors" href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="hover:text-dark transition-colors">로그아웃</button>
+          </div>
         </div>
 
         <button class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
@@ -127,6 +124,14 @@
           <a class="hover:text-brand" href="vote.html">트렌드 투표</a>
           <a class="text-dark" href="upload.html">업로드</a>
         </div>
+          <div id="mobileAuthLoggedOut" class="flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="login.html">로그인</a>
+            <a href="signup.html">회원가입</a>
+          </div>
+          <div id="mobileAuthLoggedIn" class="hidden flex gap-4 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            <a href="mypage.html">마이페이지</a>
+            <button onclick="logout()" class="text-gray-500">로그아웃</button>
+          </div>
       </div>
     </nav>
   </header>
@@ -389,5 +394,19 @@
     </div>
   </footer>
 
+  <script>
+    function updateAuthUI() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      document.getElementById('authLoggedOut').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('authLoggedIn').classList.toggle('hidden', !isLoggedIn);
+      document.getElementById('mobileAuthLoggedOut').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('mobileAuthLoggedIn').classList.toggle('hidden', !isLoggedIn);
+    }
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      window.location.href = 'index.html';
+    }
+    updateAuthUI();
+  </script>
 </body>
 </html>

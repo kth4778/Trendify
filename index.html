@@ -626,8 +626,11 @@
   </script>
 
   <script>
-    // 메인 페이지 진입 시 항상 로그아웃 상태로 초기화
-    localStorage.removeItem('isLoggedIn');
+    // 브라우저 세션 첫 진입 시에만 로그아웃 상태로 초기화
+    if (!sessionStorage.getItem('sessionStarted')) {
+      localStorage.removeItem('isLoggedIn');
+      sessionStorage.setItem('sessionStarted', 'true');
+    }
     function updateAuthUI() {
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
       document.getElementById('authLoggedOut').classList.toggle('hidden', isLoggedIn);
